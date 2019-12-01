@@ -36,88 +36,50 @@ class SessionRepository implements StorageRepository
     }
 
     /**
-     * Get the storage key.
-     *
-     * @param  string|null $key
-     * @return string
-     */
-    protected function storageKey($key = null)
-    {
-        return $key ? $this->storageKey.'.'.$key : $this->storageKey;
-    }
-
-    /**
-     * Determine if the given cart storage value exists.
-     *
-     * @param  string $key
-     * @return bool
-     */
-    public function has($key): bool
-    {
-        return $this->session->has(
-            $this->storageKey($key)
-        );
-    }
-
-    /**
-     * Get the specified cart storage value.
-     *
-     * @param  array|string $key
-     * @param  mixed $default
-     * @return mixed
-     */
-    public function get($key, $default = null)
-    {
-        return $this->session->get(
-            $this->storageKey($key), $default
-        );
-    }
-
-    /**
      * Get all of the cart storage items for the application.
      *
      * @return \Illuminate\Support\Collection
      */
-    public function all(): Collection
+    public function get(): Collection
     {
         return Collection::make($this->session->get(
-            $this->storageKey(), []
+            $this->storageKey, []
         ));
     }
 
     /**
      * Set a given cart storage value.
      *
-     * @param  array|string $key
      * @param  mixed $value
      * @return void
      */
-    public function set($key, $value = null)
+    public function set($value)
     {
         return $this->session->set(
-            $this->storageKey($key), $value
+            $this->storageKey, $value
         );
     }
 
     /**
      * Prepend a value onto an array cart storage value.
      *
-     * @param  string $key
      * @param  mixed $value
      * @return void
      */
-    public function prepend($key, $value)
+    public function prepend($value)
     {
     }
 
     /**
      * Push a value onto an array cart storage value.
      *
-     * @param  string $key
      * @param  mixed $value
      * @return void
      */
-    public function push($key, $value)
+    public function push($value)
     {
+        return $this->session->push(
+            $this->storageKey, $value
+        );
     }
 }

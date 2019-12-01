@@ -7,53 +7,33 @@ use Illuminate\Support\Collection;
 interface StorageRepository
 {
     /**
-     * Determine if the given cart storage value exists.
-     *
-     * @param  string $key
-     * @return bool
-     */
-    public function has($key): bool;
-
-    /**
-     * Get the specified cart storage value.
-     *
-     * @param  array|string $key
-     * @param  mixed $default
-     * @return mixed
-     */
-    public function get($key, $default = null);
-
-    /**
      * Get all of the cart storage items for the application.
      *
      * @return \Illuminate\Support\Collection
      */
-    public function all(): Collection;
+    public function get(): Collection;
 
     /**
      * Set a given cart storage value.
      *
-     * @param  array|string $key
      * @param  mixed $value
      * @return void
      */
-    public function set($key, $value = null);
+    public function set($value);
 
     /**
      * Prepend a value onto an array cart storage value.
      *
-     * @param  string $key
      * @param  mixed $value
      * @return void
      */
-    public function prepend($key, $value);
+    public function prepend($value);
 
     /**
      * Push a value onto an array cart storage value.
      *
-     * @param  string $key
      * @param  mixed $value
      * @return void
      */
-    public function push($key, $value);
+    public function push($value);
 }

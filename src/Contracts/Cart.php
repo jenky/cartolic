@@ -2,7 +2,10 @@
 
 namespace Jenky\Cartolic\Contracts;
 
+use Cknow\Money\Money;
 use Illuminate\Support\Collection;
+use Jenky\Cartolic\CartItem;
+use Jenky\Cartolic\Purchasable;
 
 interface Cart
 {
@@ -14,62 +17,57 @@ interface Cart
     public function items(): Collection;
 
     /**
-     * Get cart sub total.
+     * Get cart subtotal.
      *
-     * @param  bool $withoutDiscounts
      * @return \Cknow\Money\Money
      */
-    // public function subTotal(bool $withoutDiscounts = true): Money;
+    public function subtotal(): Money;
 
     /**
      * Get cart total.
      *
-     * @param  bool $withoutDiscounts
      * @return \Cknow\Money\Money
      */
-    // public function total(bool $withoutDiscounts = true): Money;
+    public function total(): Money;
 
     /**
      * Find the cart items.
      *
      * @param  mixed $id
-     * @return \App\Cart\Storage\CartItem|null
+     * @return \Jenky\Cartolic\CartItem|null
      */
     // public function find($id);
 
     /**
      * Add an item to the cart.
      *
-     * @param  \Jenky\Cartolic\Contracts\Purchaseable $item
+     * @param  \Jenky\Cartolic\Purchasable $item
      * @param  int $quantity
-     * @param  array $options
-     * @param  array $subItems
-     * @param  \Cknow\Money\Money|null $price
-     * @return \App\Cart\Storage\CartItem
+     * @return \Jenky\Cartolic\CartItem
      */
-    // public function add(Purchaseable $item, int $quantity = 1, array $options = [], array $subItems = [], Money $price = null): CartItem;
+    public function add(Purchasable $item, int $quantity = 1): CartItem;
 
     /**
      * Update an item of the cart.
      *
-     * @param  \Jenky\Cartolic\Contracts\Purchaseable $item
+     * @param  \Jenky\Cartolic\Purchasable $item
      * @param  array $data
-     * @return \App\Cart\Storage\CartItem
+     * @return \Jenky\Cartolic\CartItem
      */
-    // public function update(Purchaseable $item, array $data = []): CartItem;
+    // public function update(Purchasable $item, array $data = []): CartItem;
 
     /**
      * Remove an item from the cart.
      *
-     * @param  \Jenky\Cartolic\Contracts\Purchaseable $item
+     * @param  \Jenky\Cartolic\Purchasable $item
      * @return void
      */
-    // public function remove(Purchaseable $item);
+    // public function remove(Purchasable $item);
 
     /**
-     * Clear cart.
+     * Clear the cart.
      *
      * @return void
      */
-    // public function clear();
+    public function clear();
 }
