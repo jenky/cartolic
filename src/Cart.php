@@ -63,6 +63,32 @@ class Cart implements Contract
     }
 
     /**
+     * Determine whether the cart has a specific item.
+     *
+     * @param  \Jenky\Cartolic\Purchasable $purchasable
+     * @return bool
+     */
+    public function has(Purchasable $purchasable): bool
+    {
+        return true;
+    }
+
+    /**
+     * Find the cart item.
+     *
+     * @param  mixed $item
+     * @return \Jenky\Cartolic\CartItem|null
+     */
+    public function find($item)
+    {
+        $id = $item instanceof CartItem ? $item->id : (string) $item;
+
+        return $this->items()->first(function ($cartItem) use ($id) {
+            return $cartItem->id === $id;
+        });
+    }
+
+    /**
      * Add an item to the cart.
      *
      * @param  \Jenky\Cartolic\Purchasable $purchasable
@@ -71,12 +97,15 @@ class Cart implements Contract
      */
     public function add(Purchasable $purchasable, int $quantity = 1): CartItem
     {
+        // Find already added items that are identical to current selection.
         $item = new CartItem($purchasable);
 
-        // Find already added items that are identical to current selection.
-
-        // Otherwise, push it to the storage.
-        $this->storage->push($item);
+        if ($existing = $this->find($item)) {
+            // Update existing item in cart.
+        } else {
+            // Otherwise, push it to the storage.
+            $this->storage->push($item);
+        }
 
         return $item;
     }

@@ -5,10 +5,8 @@ namespace Jenky\Cartolic;
 use Cknow\Money\Money;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
-use Jenky\Cartolic\Purchasable;
 use JsonSerializable;
 
 class CartItem implements Arrayable, Jsonable, JsonSerializable
@@ -42,16 +40,13 @@ class CartItem implements Arrayable, Jsonable, JsonSerializable
      * Create a new cart item instance.
      *
      * @param  \Jenky\Cartolic\Purchasable $purchasable
-     * @param  int $quantity
      * @return void
      */
-    public function __construct(Purchasable $purchasable, int $quantity = 1)
+    public function __construct(Purchasable $purchasable)
     {
         $this->purchasable = $purchasable;
 
-        $this->id = (string) Str::orderedUuid();
-
-        $this->quantity($quantity, true);
+        $this->id = $purchasable->hash();
     }
 
     /**

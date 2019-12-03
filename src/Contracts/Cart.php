@@ -31,12 +31,12 @@ interface Cart
     public function total(): Money;
 
     /**
-     * Find the cart items.
+     * Find the cart item.
      *
-     * @param  mixed $id
+     * @param  mixed $item
      * @return \Jenky\Cartolic\CartItem|null
      */
-    // public function find($id);
+    public function find($item);
 
     /**
      * Add an item to the cart.

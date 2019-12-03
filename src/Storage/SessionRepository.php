@@ -55,7 +55,7 @@ class SessionRepository implements StorageRepository
      */
     public function set($value)
     {
-        return $this->session->set(
+        return $this->session->put(
             $this->storageKey, $value
         );
     }
