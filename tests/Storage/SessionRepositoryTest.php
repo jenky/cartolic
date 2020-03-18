@@ -1,6 +1,6 @@
 <?php
 
-namespace Jenky\Cartolic\Test\Storage;
+namespace Jenky\Cartolic\Tests\Storage;
 
 class SessionRepositoryTest extends CartStorageTestCase
 {

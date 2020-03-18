@@ -3,11 +3,14 @@
 namespace Jenky\Cartolic\Contracts;
 
 use Cknow\Money\Money;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Jenky\Cartolic\CartItem;
 use Jenky\Cartolic\Purchasable;
+use JsonSerializable;
 
-interface Cart
+interface Cart extends Arrayable, Jsonable, JsonSerializable
 {
     /**
      * Get all the cart items.

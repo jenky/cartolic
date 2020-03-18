@@ -119,4 +119,39 @@ class Cart implements Contract
     {
         //
     }
+
+    /**
+     * Convert the object to its array representation.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'items' => $this->items()->toArray(),
+            'subtotal' => $this->subtotal(),
+            'total' => $this->total(),
+        ];
+    }
+
+    /**
+     * Convert the purchasable into something JSON serializable.
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * Convert the object to its JSON representation.
+     *
+     * @param  int $options
+     * @return string
+     */
+    public function toJson($options = 0)
+    {
+        return json_encode($this->toArray(), $options);
+    }
 }

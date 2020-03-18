@@ -1,8 +1,8 @@
 <?php
 
-namespace Jenky\Cartolic\Test\Storage;
+namespace Jenky\Cartolic\Tests\Storage;
 
-use Jenky\Cartolic\Test\TestCase;
+use Jenky\Cartolic\Tests\TestCase;
 
 class DatabaseRepositoryTest extends TestCase
 {

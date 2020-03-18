@@ -1,6 +1,6 @@
 <?php
 
-namespace Jenky\Cartolic\Test;
+namespace Jenky\Cartolic\Tests;
 
 use Jenky\Cartolic\CartolicServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -51,7 +51,5 @@ class TestCase extends BaseTestCase
             'database' => ':memory:',
             'prefix' => '',
         ]);
-
-        $config->set('session.driver', 'array');
     }
 }

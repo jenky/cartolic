@@ -1,10 +1,10 @@
 <?php
 
-namespace Jenky\Cartolic\Test\Storage;
+namespace Jenky\Cartolic\Tests\Storage;
 
 use Illuminate\Support\Collection;
-use Jenky\Cartolic\Test\Item;
-use Jenky\Cartolic\Test\TestCase;
+use Jenky\Cartolic\Tests\Item;
+use Jenky\Cartolic\Tests\TestCase;
 
 abstract class CartStorageTestCase extends TestCase
 {

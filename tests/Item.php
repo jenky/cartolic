@@ -1,6 +1,6 @@
 <?php
 
-namespace Jenky\Cartolic\Test;
+namespace Jenky\Cartolic\Tests;
 
 use Cknow\Money\Money;
 use Illuminate\Foundation\Testing\WithFaker;
