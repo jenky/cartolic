@@ -5,8 +5,9 @@ namespace Jenky\Cartolic;
 use Brick\Money\Money as 💸;
 use Illuminate\Support\Traits\Macroable;
 use Jenky\Cartolic\Contracts\Money;
+use Jenky\Cartolic\Contracts\Purchasable as Contract;
 
-class Purchasable implements Contracts\Purchasable
+class Purchasable implements Contract
 {
     use Macroable;
 
@@ -27,7 +28,7 @@ class Purchasable implements Contracts\Purchasable
     /**
      * The purchasable item price.
      *
-     * @var \Cknow\Money\Money
+     * @var \Jenky\Cartolic\Contracts\Money
      */
     public $price;
 
@@ -70,7 +71,7 @@ class Purchasable implements Contracts\Purchasable
         $this->resource = $resource;
 
         // Assign default price.
-        $this->price = new Money(💸::zero('USD'));
+        // $this->price = new \Jenky\Cartolic\Money(💸::zero('USD'));
     }
 
     /**
@@ -98,6 +99,16 @@ class Purchasable implements Contracts\Purchasable
     }
 
     /**
+     * Get the item name.
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    /**
      * Assign the purchasable item description.
      *
      * @param  string $description
@@ -108,6 +119,16 @@ class Purchasable implements Contracts\Purchasable
         $this->description = $description;
 
         return $this;
+    }
+
+    /**
+     * Get the purchasable item description.
+     *
+     * @return string
+     */
+    public function description(): string
+    {
+        return $this->description;
     }
 
     /**
@@ -124,6 +145,16 @@ class Purchasable implements Contracts\Purchasable
     }
 
     /**
+     * Get the purchasable item price.
+     *
+     * @return \Jenky\Cartolic\Contracts\Money
+     */
+    public function price(): Money
+    {
+        return $this->price;
+    }
+
+    /**
      * Assign the purchasable item options.
      *
      * @param  string $options
@@ -137,6 +168,16 @@ class Purchasable implements Contracts\Purchasable
     }
 
     /**
+     * Get the purchasable item options.
+     *
+     * @return array
+     */
+    public function options(): array
+    {
+        return [];
+    }
+
+    /**
      * Assign the purchasable item metadata.
      *
      * @param  string $metadata
@@ -147,6 +188,16 @@ class Purchasable implements Contracts\Purchasable
         $this->metadata = $metadata;
 
         return $this;
+    }
+
+    /**
+     * Get the purchasable item metadata.
+     *
+     * @return array
+     */
+    public function metadata(): array
+    {
+        return [];
     }
 
     /**
@@ -171,7 +222,7 @@ class Purchasable implements Contracts\Purchasable
     public function toArray()
     {
         return [
-            'item' => $this->item,
+            'name' => $this->name,
             'description' => $this->description(),
             'price' => $this->price->toArray(),
             'options' => $this->options(),

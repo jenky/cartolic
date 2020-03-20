@@ -16,6 +16,11 @@ class Money implements Contracts\Money
         $this->money = $money;
     }
 
+    public function toMoney(): AbstractMoney
+    {
+        return $this->money;
+    }
+
     public function amount()
     {
         return $this->money->getAmount();
@@ -28,7 +33,7 @@ class Money implements Contracts\Money
 
     public function format(?\NumberFormatter $formatter = null): string
     {
-        return '';
+        return $formatter ? $this->money->formatWith($formatter) : $this->money->formatTo('en_US');
     }
 
     /**
@@ -39,8 +44,8 @@ class Money implements Contracts\Money
     public function toArray()
     {
         return [
-            'amount' => $this->amount(),
-            'currency' => $this->currency(),
+            'amount' => (string) $this->amount(),
+            'currency' => (string) $this->currency(),
             'formatted' => $this->format(),
         ];
     }
@@ -81,7 +86,7 @@ class Money implements Contracts\Money
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
+     * @return self
      */
     public function __call($method, $parameters)
     {

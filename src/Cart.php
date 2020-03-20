@@ -58,7 +58,7 @@ class Cart implements Contract
     /**
      * Get cart total.
      *
-     * @return \Cknow\Money\Money
+     * @return \Jenky\Cartolic\Contracts\Money
      */
     public function total(): Money
     {
@@ -68,7 +68,7 @@ class Cart implements Contract
     /**
      * Determine whether the cart has a specific item.
      *
-     * @param  \Jenky\Cartolic\Purchasable $purchasable
+     * @param  \Jenky\Cartolic\Contracts\Purchasable $purchasable
      * @return bool
      */
     public function has(Purchasable $purchasable): bool
@@ -111,6 +111,17 @@ class Cart implements Contract
         }
 
         return $item;
+    }
+
+    /**
+     * Remove an item from the cart.
+     *
+     * @param  \Jenky\Cartolic\Contracts\Purchasable $item
+     * @return void
+     */
+    public function remove(Purchasable $item)
+    {
+        //
     }
 
     /**

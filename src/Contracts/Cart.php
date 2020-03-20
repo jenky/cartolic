@@ -59,10 +59,10 @@ interface Cart extends Arrayable, Jsonable, JsonSerializable
     /**
      * Remove an item from the cart.
      *
-     * @param  \Jenky\Cartolic\Purchasable $item
+     * @param  \Jenky\Cartolic\Contracts\Purchasable $item
      * @return void
      */
-    public function remove(Purchasable $item);
+    // public function remove(Purchasable $item);
 
     /**
      * Clear the cart.
