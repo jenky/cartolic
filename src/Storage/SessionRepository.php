@@ -4,7 +4,7 @@ namespace Jenky\Cartolic\Storage;
 
 use Illuminate\Session\Store;
 use Illuminate\Support\Collection;
-use Jenky\Cartolic\Contracts\StorageRepository;
+use Jenky\Cartolic\Contracts\Storage\StorageRepository;
 
 class SessionRepository implements StorageRepository
 {

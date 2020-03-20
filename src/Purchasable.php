@@ -2,13 +2,11 @@
 
 namespace Jenky\Cartolic;
 
-use Cknow\Money\Money;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
+use Brick\Money\Money as 💸;
 use Illuminate\Support\Traits\Macroable;
-use JsonSerializable;
+use Jenky\Cartolic\Contracts\Money;
 
-class Purchasable implements Arrayable, Jsonable, JsonSerializable
+class Purchasable implements Contracts\Purchasable
 {
     use Macroable;
 
@@ -65,7 +63,7 @@ class Purchasable implements Arrayable, Jsonable, JsonSerializable
         $this->resource = $resource;
 
         // Assign default price.
-        $this->price = money(0);
+        $this->price = new Money(💸::zero('USD'));
     }
 
     /**
@@ -85,7 +83,7 @@ class Purchasable implements Arrayable, Jsonable, JsonSerializable
      * @param  string $name
      * @return $this
      */
-    public function name($name)
+    public function withName($name)
     {
         $this->name = $name;
 
@@ -98,7 +96,7 @@ class Purchasable implements Arrayable, Jsonable, JsonSerializable
      * @param  string $description
      * @return $this
      */
-    public function description($description)
+    public function withDescription($description)
     {
         $this->description = $description;
 
@@ -108,10 +106,10 @@ class Purchasable implements Arrayable, Jsonable, JsonSerializable
     /**
      * Assign the purchasable item price.
      *
-     * @param  \Cknow\Money\Money $price
+     * @param  \Jenky\Cartolic\Contracts\Money $price
      * @return $this
      */
-    public function price(Money $price)
+    public function withPrice(Money $price)
     {
         $this->price = $price;
 
@@ -124,7 +122,7 @@ class Purchasable implements Arrayable, Jsonable, JsonSerializable
      * @param  string $options
      * @return $this
      */
-    public function options(array $options)
+    public function withOptions(array $options)
     {
         $this->options = $options;
 
@@ -137,7 +135,7 @@ class Purchasable implements Arrayable, Jsonable, JsonSerializable
      * @param  string $metadata
      * @return $this
      */
-    public function metadata(array $metadata)
+    public function withMetadata(array $metadata)
     {
         $this->metadata = $metadata;
 
@@ -153,10 +151,10 @@ class Purchasable implements Arrayable, Jsonable, JsonSerializable
     {
         return [
             'item' => $this->item,
-            'description' => $this->description,
+            'description' => $this->description(),
             'price' => $this->price->toArray(),
-            'options' => $this->options,
-            'metadata' => $this->metadata,
+            'options' => $this->options(),
+            'metadata' => $this->metadata(),
         ];
     }
 

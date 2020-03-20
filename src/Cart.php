@@ -2,11 +2,14 @@
 
 namespace Jenky\Cartolic;
 
-use Cknow\Money\Money;
+use Brick\Money\MoneyBag;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use Jenky\Cartolic\Contracts\Cart as Contract;
-use Jenky\Cartolic\Contracts\StorageRepository;
+use Jenky\Cartolic\Contracts\Item;
+use Jenky\Cartolic\Contracts\Money;
+use Jenky\Cartolic\Contracts\Purchasable;
+use Jenky\Cartolic\Contracts\Storage\StorageRepository;
 
 class Cart implements Contract
 {
@@ -43,13 +46,13 @@ class Cart implements Contract
     /**
      * Get cart subtotal.
      *
-     * @return \Cknow\Money\Money
+     * @return \Jenky\Cartolic\Contracts\Money
      */
     public function subtotal(): Money
     {
-        return $this->items()->reduce(function ($carry, $item) {
-            return $carry->add($item->total());
-        }, money(0));
+        return $this->items()->reduce(function ($carry, Item $item) {
+            return $carry->add($item->total()->toMoney());
+        }, new MoneyBag);
     }
 
     /**
@@ -65,11 +68,11 @@ class Cart implements Contract
     /**
      * Add an item to the cart.
      *
-     * @param  \Jenky\Cartolic\Purchasable $purchasable
+     * @param  \Jenky\Cartolic\Contracts\Purchasable $item
      * @param  int $quantity
-     * @return \Jenky\Cartolic\CartItem
+     * @return \Jenky\Cartolic\Contracts\Item
      */
-    public function add(Purchasable $purchasable, int $quantity = 1): CartItem
+    public function add(Purchasable $purchasable, int $quantity = 1): Item
     {
         $item = new CartItem($purchasable);
 

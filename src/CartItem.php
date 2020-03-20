@@ -2,16 +2,13 @@
 
 namespace Jenky\Cartolic;
 
-use Cknow\Money\Money;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
-use Jenky\Cartolic\Purchasable;
-use JsonSerializable;
+use Jenky\Cartolic\Contracts\Item;
+use Jenky\Cartolic\Contracts\Purchasable;
 
-class CartItem implements Arrayable, Jsonable, JsonSerializable
+class CartItem implements Item
 {
     use ForwardsCalls, Macroable {
         __call as macroCall;
@@ -20,7 +17,7 @@ class CartItem implements Arrayable, Jsonable, JsonSerializable
     /**
      * The purchasable item.
      *
-     * @var \Jenky\Cartolic\Purchasable
+     * @var \Jenky\Cartolic\Contracts\Purchasable
      */
     protected $purchasable;
 
@@ -36,12 +33,12 @@ class CartItem implements Arrayable, Jsonable, JsonSerializable
      *
      * @var int
      */
-    public $quantity = 1;
+    protected $quantity = 1;
 
     /**
      * Create a new cart item instance.
      *
-     * @param  \Jenky\Cartolic\Purchasable $purchasable
+     * @param  \Jenky\Cartolic\Contracts\Purchasable $purchasable
      * @param  int $quantity
      * @return void
      */
@@ -51,37 +48,67 @@ class CartItem implements Arrayable, Jsonable, JsonSerializable
 
         $this->id = (string) Str::orderedUuid();
 
-        $this->quantity($quantity, true);
+        $this->quantity = $quantity;
     }
 
     /**
-     * Assign the item quantity.
+     * Get the item quantity.
      *
-     * @param  int $quantity
-     * @param  bool $force
+     * @return int
+     */
+    public function quantity(): int
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * Increment item quantity by a given amount.
+     *
+     * @param  int $amount
      * @return $this
      */
-    public function quantity(int $quantity, $force = false)
+    public function increment(int $amount = 1)
     {
-        if ($force) {
-            $this->quantity = $quantity;
-        } else {
-            $this->quantity += $quantity;
-        }
+        $this->quantity += $amount;
 
         return $this;
     }
 
     /**
+     * Decrement item quantity by a given amount.
+     *
+     * @param  int $amount
+     * @return $this
+     */
+    public function decrement(int $amount = 1)
+    {
+        $quantity = $this->quantity -= $amount;
+
+        $this->quantity = $quantity >= 0 ? $quantity : 0;
+
+        return $this;
+    }
+
+    /**
+     * Get the subtotal amount of the item.
+     *
+     * @return \Jenky\Cartolic\Contracts\Money
+     */
+    public function subtotal(): Money
+    {
+        return $this->purchasable->price->multipliedBy(
+            $this->quantity
+        );
+    }
+
+    /**
      * Get the total amount of the item.
      *
-     * @return \Cknow\Money\Money
+     * @return \Jenky\Cartolic\Contracts\Money
      */
     public function total(): Money
     {
-        return $this->purchasable->price->multiply(
-            $this->quantity
-        );
+        return $this->subtotal();
     }
 
     /**

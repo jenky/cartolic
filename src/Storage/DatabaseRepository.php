@@ -2,7 +2,7 @@
 
 namespace Jenky\Cartolic\Storage;
 
-use Jenky\Cartolic\Contracts\StorageRepository;
+use Jenky\Cartolic\Contracts\Storage\StorageRepository;
 
 class DatabaseRepository implements StorageRepository
 {

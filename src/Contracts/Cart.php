@@ -2,12 +2,13 @@
 
 namespace Jenky\Cartolic\Contracts;
 
-use Cknow\Money\Money;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Jenky\Cartolic\CartItem;
-use Jenky\Cartolic\Purchasable;
+use JsonSerializable;
 
-interface Cart
+interface Cart extends Arrayable, Jsonable, JsonSerializable
 {
     /**
      * Get all the cart items.
@@ -19,14 +20,14 @@ interface Cart
     /**
      * Get cart subtotal.
      *
-     * @return \Cknow\Money\Money
+     * @return \Jenky\Cartolic\Contracts\Money
      */
     public function subtotal(): Money;
 
     /**
      * Get cart total.
      *
-     * @return \Cknow\Money\Money
+     * @return \Jenky\Cartolic\Contracts\Money
      */
     public function total(): Money;
 
@@ -41,11 +42,11 @@ interface Cart
     /**
      * Add an item to the cart.
      *
-     * @param  \Jenky\Cartolic\Purchasable $item
+     * @param  \Jenky\Cartolic\Contracts\Purchasable $item
      * @param  int $quantity
-     * @return \Jenky\Cartolic\CartItem
+     * @return \Jenky\Cartolic\Contracts\Item
      */
-    public function add(Purchasable $item, int $quantity = 1): CartItem;
+    public function add(Purchasable $item, int $quantity = 1): Item;
 
     /**
      * Update an item of the cart.
@@ -62,7 +63,7 @@ interface Cart
      * @param  \Jenky\Cartolic\Purchasable $item
      * @return void
      */
-    // public function remove(Purchasable $item);
+    public function remove(Purchasable $item);
 
     /**
      * Clear the cart.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Jenky\Cartolic\Contracts;
+namespace Jenky\Cartolic\Contracts\Storage;
 
 use Illuminate\Support\Collection;
 
