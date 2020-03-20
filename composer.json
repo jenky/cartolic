@@ -53,7 +53,7 @@
                 "Jenky\\Cartolic\\CartolicServiceProvider"
             ],
             "aliases": {
-                "Guzzle": "Jenky\\Cartolic\\Facades\\Cart"
+                "Cart": "Jenky\\Cartolic\\Facades\\Cart"
             }
         }
     },
