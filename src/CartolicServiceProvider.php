@@ -3,6 +3,8 @@
 namespace Jenky\Cartolic;
 
 use Illuminate\Support\ServiceProvider;
+use Jenky\Cartolic\Contracts\Cart;
+use Jenky\Cartolic\Contracts\StorageRepository;
 
 class CartolicServiceProvider extends ServiceProvider
 {
@@ -41,9 +43,23 @@ class CartolicServiceProvider extends ServiceProvider
             __DIR__.'/../config/cart.php', 'cart'
         );
 
+        $this->registerStorageManager();
+
         $this->registerStorageDriver();
 
-        $this->registerCartServices();
+        $this->registerCart();
+    }
+
+    /**
+     * Register the package storage driver.
+     *
+     * @return void
+     */
+    protected function registerStorageManager()
+    {
+        $this->app->singleton(StorageManager::class, function ($app) {
+            return new StorageManager($app);
+        });
     }
 
     /**
@@ -53,13 +69,11 @@ class CartolicServiceProvider extends ServiceProvider
      */
     protected function registerStorageDriver()
     {
-        $this->app->singleton(StorageManager::class, function ($app) {
-            return new StorageManager($app);
+        $this->app->bind(StorageRepository::class, function ($app) {
+            return $app->make(StorageManager::class)->driver();
         });
 
-        $this->app->bind('cart.storage', function ($app) {
-            return $app[StorageManager::class]->driver();
-        });
+        $this->app->alias(StorageRepository::class, 'cart.storage');
     }
 
     /**
@@ -67,12 +81,12 @@ class CartolicServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerCartServices()
+    protected function registerCart()
     {
-        $this->app->singleton(Contracts\Cart::class, function ($app) {
-            return new Cart($app['cart.storage']);
+        $this->app->singleton(Cart::class, function ($app) {
+            return new Cart($app->make(StorageRepository::class));
         });
 
-        $this->app->alias(Contracts\Cart::class, 'cart');
+        $this->app->alias(Cart::class, 'cart');
     }
 }

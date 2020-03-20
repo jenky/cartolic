@@ -51,7 +51,5 @@ class TestCase extends BaseTestCase
             'database' => ':memory:',
             'prefix' => '',
         ]);
-
-        $config->set('session.driver', 'array');
     }
 }

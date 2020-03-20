@@ -53,6 +53,13 @@ class Purchasable implements Contracts\Purchasable
     protected $resource;
 
     /**
+     * The purchasable item hash.
+     *
+     * @var string
+     */
+    protected $hash;
+
+    /**
      * Create a new purchasable instance.
      *
      * @param  mixed $resource
@@ -140,6 +147,20 @@ class Purchasable implements Contracts\Purchasable
         $this->metadata = $metadata;
 
         return $this;
+    }
+
+    /**
+     * Get the purchasable item hash.
+     *
+     * @return string
+     */
+    public function hash()
+    {
+        if (is_null($this->hash)) {
+            $this->hash = md5($this->toJson());
+        }
+
+        return $this->hash;
     }
 
     /**

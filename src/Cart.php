@@ -66,6 +66,32 @@ class Cart implements Contract
     }
 
     /**
+     * Determine whether the cart has a specific item.
+     *
+     * @param  \Jenky\Cartolic\Purchasable $purchasable
+     * @return bool
+     */
+    public function has(Purchasable $purchasable): bool
+    {
+        return true;
+    }
+
+    /**
+     * Find the cart item.
+     *
+     * @param  mixed $item
+     * @return \Jenky\Cartolic\CartItem|null
+     */
+    public function find($item)
+    {
+        $id = $item instanceof CartItem ? $item->id : (string) $item;
+
+        return $this->items()->first(function ($cartItem) use ($id) {
+            return $cartItem->id === $id;
+        });
+    }
+
+    /**
      * Add an item to the cart.
      *
      * @param  \Jenky\Cartolic\Contracts\Purchasable $item
@@ -74,12 +100,15 @@ class Cart implements Contract
      */
     public function add(Purchasable $purchasable, int $quantity = 1): Item
     {
+        // Find already added items that are identical to current selection.
         $item = new CartItem($purchasable);
 
-        // Find already added items that are identical to current selection.
-
-        // Otherwise, push it to the storage.
-        $this->storage->push($item);
+        if ($existing = $this->find($item)) {
+            // Update existing item in cart.
+        } else {
+            // Otherwise, push it to the storage.
+            $this->storage->push($item);
+        }
 
         return $item;
     }
@@ -92,5 +121,40 @@ class Cart implements Contract
     public function clear()
     {
         //
+    }
+
+    /**
+     * Convert the object to its array representation.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'items' => $this->items()->toArray(),
+            'subtotal' => $this->subtotal(),
+            'total' => $this->total(),
+        ];
+    }
+
+    /**
+     * Convert the purchasable into something JSON serializable.
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * Convert the object to its JSON representation.
+     *
+     * @param  int $options
+     * @return string
+     */
+    public function toJson($options = 0)
+    {
+        return json_encode($this->toArray(), $options);
     }
 }

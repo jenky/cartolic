@@ -47,6 +47,7 @@ class CartItem implements Item
         $this->purchasable = $purchasable;
 
         $this->id = (string) Str::orderedUuid();
+        // $this->id = $purchasable->hash();
 
         $this->quantity = $quantity;
     }
