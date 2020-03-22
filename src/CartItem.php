@@ -5,7 +5,7 @@ namespace Jenky\Cartolic;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
-use Jenky\Cartolic\Contracts\Item;
+use Jenky\Cartolic\Contracts\Cart\Item;
 use Jenky\Cartolic\Contracts\Purchasable;
 
 class CartItem implements Item
@@ -20,13 +20,6 @@ class CartItem implements Item
      * @var \Jenky\Cartolic\Contracts\Purchasable
      */
     protected $purchasable;
-
-    /**
-     * The item Id.
-     *
-     * @var string
-     */
-    public $id;
 
     /**
      * The item quantity.
@@ -46,11 +39,21 @@ class CartItem implements Item
     {
         $this->purchasable = $purchasable;
 
-        $this->id = (string) Str::orderedUuid();
+        // $this->id = (string) Str::orderedUuid();
         // $this->id = $purchasable->hash();
 
         $this->quantity = $quantity;
     }
+
+    /**
+     * Get the purchasable item hash.
+     *
+     * @return string|int
+     */
+    // public function id()
+    // {
+    //     return $this->purchasable()->sku();
+    // }
 
     /**
      * Get the item quantity.
@@ -113,6 +116,16 @@ class CartItem implements Item
     }
 
     /**
+     * Get the purchasable item.
+     *
+     * @return \Jenky\Cartolic\Contracts\Purchasable
+     */
+    public function purchasable(): Purchasable
+    {
+        return $this->purchasable;
+    }
+
+    /**
      * Convert the purchasable instance to an array.
      *
      * @return array
@@ -120,7 +133,9 @@ class CartItem implements Item
     public function toArray()
     {
         return [
+            // 'id' => $this->id(),
             'purchasable' => $this->purchasable->toArray(),
+            'quantity' => $this->quantity(),
             'total' => $this->total()->toArray(),
         ];
     }

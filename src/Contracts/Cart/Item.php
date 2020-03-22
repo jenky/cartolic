@@ -1,9 +1,22 @@
 <?php
 
-namespace Jenky\Cartolic\Contracts;
+namespace Jenky\Cartolic\Contracts\Cart;
 
-interface Item extends Purchasable
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Jenky\Cartolic\Contracts\Money;
+use Jenky\Cartolic\Contracts\Purchasable;
+use JsonSerializable;
+
+interface Item extends Arrayable, Jsonable, JsonSerializable
 {
+    /**
+     * Get the purchasable item hash.
+     *
+     * @return string|int
+     */
+    // public function id();
+
     /**
      * Get the item quantity.
      *
@@ -40,4 +53,11 @@ interface Item extends Purchasable
      * @return int
      */
     public function total(): Money;
+
+    /**
+     * Get the purchasable item.
+     *
+     * @return \Jenky\Cartolic\Contracts\Purchasable
+     */
+    public function purchasable(): Purchasable;
 }

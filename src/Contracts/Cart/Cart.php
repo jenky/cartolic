@@ -1,10 +1,12 @@
 <?php
 
-namespace Jenky\Cartolic\Contracts;
+namespace Jenky\Cartolic\Contracts\Cart;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
+use Jenky\Cartolic\Contracts\Money;
+use Jenky\Cartolic\Contracts\Purchasable;
 use JsonSerializable;
 
 interface Cart extends Arrayable, Jsonable, JsonSerializable
@@ -31,12 +33,20 @@ interface Cart extends Arrayable, Jsonable, JsonSerializable
     public function total(): Money;
 
     /**
-     * Find the cart item.
+     * Determine whether the cart has a specific item.
      *
      * @param  mixed $item
-     * @return \Jenky\Cartolic\CartItem|null
+     * @return bool
      */
-    public function find($item);
+    public function has($item): bool;
+
+    /**
+     * Get the cart item.
+     *
+     * @param  mixed $item
+     * @return \Jenky\Cartolic\Contracts\Cart\Item|null
+     */
+    public function get($item): ?Item;
 
     /**
      * Add an item to the cart.
@@ -47,7 +57,7 @@ interface Cart extends Arrayable, Jsonable, JsonSerializable
      */
     public function add(Purchasable $item, int $quantity = 1): Item;
 
-    /**
+    /*
      * Update an item of the cart.
      *
      * @param  \Jenky\Cartolic\Purchasable $item
@@ -56,18 +66,11 @@ interface Cart extends Arrayable, Jsonable, JsonSerializable
      */
     // public function update(Purchasable $item, array $data = []): CartItem;
 
-    /**
+    /*
      * Remove an item from the cart.
      *
      * @param  \Jenky\Cartolic\Contracts\Purchasable $item
      * @return void
      */
     // public function remove(Purchasable $item);
-
-    /**
-     * Clear the cart.
-     *
-     * @return void
-     */
-    public function clear();
 }

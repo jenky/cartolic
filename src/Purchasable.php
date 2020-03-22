@@ -2,7 +2,6 @@
 
 namespace Jenky\Cartolic;
 
-use Brick\Money\Money as 💸;
 use Illuminate\Support\Traits\Macroable;
 use Jenky\Cartolic\Contracts\Money;
 use Jenky\Cartolic\Contracts\Purchasable as Contract;
@@ -83,6 +82,16 @@ class Purchasable implements Contract
     public static function make($resource = null)
     {
         return new static($resource);
+    }
+
+    /**
+     * Get the purchasable item hash.
+     *
+     * @return string|int
+     */
+    public function sku()
+    {
+        return '111';
     }
 
     /**
@@ -201,20 +210,6 @@ class Purchasable implements Contract
     }
 
     /**
-     * Get the purchasable item hash.
-     *
-     * @return string
-     */
-    public function hash()
-    {
-        if (is_null($this->hash)) {
-            $this->hash = md5($this->toJson());
-        }
-
-        return $this->hash;
-    }
-
-    /**
      * Convert the purchasable instance to an array.
      *
      * @return array
@@ -224,6 +219,7 @@ class Purchasable implements Contract
         return [
             'name' => $this->name,
             'description' => $this->description(),
+            'sku' => $this->sku(),
             'price' => $this->price->toArray(),
             'options' => $this->options(),
             'metadata' => $this->metadata(),

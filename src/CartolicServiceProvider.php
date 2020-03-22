@@ -3,7 +3,8 @@
 namespace Jenky\Cartolic;
 
 use Illuminate\Support\ServiceProvider;
-use Jenky\Cartolic\Contracts\StorageRepository;
+use Jenky\Cartolic\Contracts\Cart\Cart as Contract;
+use Jenky\Cartolic\Contracts\Storage\StorageRepository;
 
 class CartolicServiceProvider extends ServiceProvider
 {
@@ -82,10 +83,10 @@ class CartolicServiceProvider extends ServiceProvider
      */
     protected function registerCart()
     {
-        $this->app->singleton(Contracts\Cart::class, function ($app) {
+        $this->app->singleton(Contract::class, function ($app) {
             return new Cart($app->make(StorageRepository::class));
         });
 
-        $this->app->alias(Contracts\Cart::class, 'cart');
+        $this->app->alias(Contract::class, 'cart');
     }
 }

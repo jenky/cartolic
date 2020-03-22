@@ -9,6 +9,13 @@ use JsonSerializable;
 interface Purchasable extends Arrayable, Jsonable, JsonSerializable
 {
     /**
+     * Get the purchasable item hash.
+     *
+     * @return string|int
+     */
+    public function sku();
+
+    /**
      * Get the purchasable item name.
      *
      * @return string

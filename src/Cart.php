@@ -2,11 +2,10 @@
 
 namespace Jenky\Cartolic;
 
-use Brick\Money\MoneyBag;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
-use Jenky\Cartolic\Contracts\Cart as Contract;
-use Jenky\Cartolic\Contracts\Item;
+use Jenky\Cartolic\Contracts\Cart\Cart as Contract;
+use Jenky\Cartolic\Contracts\Cart\Item;
 use Jenky\Cartolic\Contracts\Money;
 use Jenky\Cartolic\Contracts\Purchasable;
 use Jenky\Cartolic\Contracts\Storage\StorageRepository;
@@ -40,7 +39,7 @@ class Cart implements Contract
      */
     public function items(): Collection
     {
-        return $this->storage->get();
+        return $this->storage->get()->values();
     }
 
     /**
@@ -51,8 +50,8 @@ class Cart implements Contract
     public function subtotal(): Money
     {
         return $this->items()->reduce(function ($carry, Item $item) {
-            return $carry->add($item->total()->toMoney());
-        }, new MoneyBag);
+            return $carry->plus($item->total()->toMoney());
+        }, new \Jenky\Cartolic\Money(\Brick\Money\Money::zero('USD')));
     }
 
     /**
@@ -66,28 +65,45 @@ class Cart implements Contract
     }
 
     /**
-     * Determine whether the cart has a specific item.
+     * Resolve the item id.
      *
-     * @param  \Jenky\Cartolic\Contracts\Purchasable $purchasable
-     * @return bool
+     * @param  mixed $item
+     * @return string|int
      */
-    public function has(Purchasable $purchasable): bool
+    protected function getItemId($item)
     {
-        return true;
+        if ($item instanceof Purchasable) {
+            return $item->sku();
+        } elseif ($item instanceof Item) {
+            return $item->purchasable()->sku();
+        }
+
+        return $item;
     }
 
     /**
-     * Find the cart item.
+     * Determine whether the cart has a specific item.
      *
      * @param  mixed $item
-     * @return \Jenky\Cartolic\CartItem|null
+     * @return bool
      */
-    public function find($item)
+    public function has($item): bool
     {
-        $id = $item instanceof CartItem ? $item->id : (string) $item;
+        return $this->items()->has($this->getItemId($item));
+    }
+
+    /**
+     * Get the cart item.
+     *
+     * @param  mixed $item
+     * @return \Jenky\Cartolic\Contracts\Cart\Item|null
+     */
+    public function get($item): ?Item
+    {
+        $id = $this->getItemId($item);
 
         return $this->items()->first(function ($cartItem) use ($id) {
-            return $cartItem->id === $id;
+            return $cartItem->purchasable()->sku() == $id;
         });
     }
 
@@ -101,13 +117,16 @@ class Cart implements Contract
     public function add(Purchasable $purchasable, int $quantity = 1): Item
     {
         // Find already added items that are identical to current selection.
-        $item = new CartItem($purchasable);
-
-        if ($existing = $this->find($item)) {
-            // Update existing item in cart.
+        if ($item = $this->get($purchasable)) {
+            // Update item item in cart.
+            $this->storage->set([
+                $item->purchasable()->sku() => $item->increment($quantity),
+            ]);
         } else {
             // Otherwise, push it to the storage.
-            $this->storage->push($item);
+            $this->storage->push(
+                $item = new CartItem($purchasable, $quantity)
+            );
         }
 
         return $item;
