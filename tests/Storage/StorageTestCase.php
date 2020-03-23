@@ -58,6 +58,10 @@ abstract class StorageTestCase extends TestCase
         $this->assertTrue($cart->total()->isPositive(), 'Cart total is not zero');
 
         $this->assertTrue($item->total()->isEqualTo($cart->subtotal()), 'Items total is equals to cart sub total');
+
+        $cart->clear();
+        $this->expectException(\InvalidArgumentException::class);
+        $cart->add($item->purchasable(), -3);
     }
 
     public function test_remove_item()
@@ -92,7 +96,7 @@ abstract class StorageTestCase extends TestCase
     public function test_fees()
     {
         $cart = $this->app->make(Cart::class);
-        $cart->add($this->item, $this->faker->randomNumber(1));
+        $cart->add($this->item, $this->faker->numberBetween(1, 10));
 
         $this->assertNotEmpty($cart->items());
 
