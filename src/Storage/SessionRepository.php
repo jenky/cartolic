@@ -29,7 +29,7 @@ class SessionRepository implements StorageRepository
      * @param  string $storageKey
      * @return void
      */
-    public function __construct(Session $session, $storageKey)
+    public function __construct(Session $session, string $storageKey)
     {
         $this->session = $session;
         $this->storageKey = $storageKey;
