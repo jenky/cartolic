@@ -9,6 +9,22 @@ use Jenky\Cartolic\Storage\SessionRepository;
 class StorageManager extends Manager
 {
     /**
+     * Get the config instance or value.
+     *
+     * @param  string|null $key
+     * @param  mixed $default
+     * @return mixed
+     */
+    protected function config(?string $key = null, $default = null)
+    {
+        $config = property_exists($this, 'config')
+            ? $this->config
+            : $this->app->make('config');
+
+        return $key ? $config->get($key, $default) : $config;
+    }
+
+    /**
      * Create a Database storage instance.
      *
      * @return \Jenky\Cartolic\Storage\DatabaseRepository
@@ -16,7 +32,8 @@ class StorageManager extends Manager
     public function createDatabaseDriver()
     {
         return new DatabaseRepository(
-            $this->app['config']->get('cart.storage.database.connection')
+            $this->config('cart.storage.database.connection'),
+            $this->config('cart.storage.database.table'),
         );
     }
 
@@ -28,8 +45,8 @@ class StorageManager extends Manager
     public function createSessionDriver()
     {
         return new SessionRepository(
-            $this->app['session']->driver($this->app['config']->get('cart.storage.session.driver')),
-            $this->app['config']->get('cart.storage.session.storage_key')
+            $this->app->make('session')->driver($this->config('cart.storage.session.driver')),
+            $this->config('cart.storage.session.storage_key')
         );
     }
 
@@ -40,6 +57,6 @@ class StorageManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['cart.driver'];
+        return $this->config('cart.driver');
     }
 }
