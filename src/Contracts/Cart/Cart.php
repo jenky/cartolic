@@ -5,12 +5,20 @@ namespace Jenky\Cartolic\Contracts\Cart;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
+use Jenky\Cartolic\Contracts\Fee\Collector;
 use Jenky\Cartolic\Contracts\Money;
 use Jenky\Cartolic\Contracts\Purchasable;
 use JsonSerializable;
 
 interface Cart extends Arrayable, Jsonable, JsonSerializable
 {
+    /**
+     * Get all the fees.
+     *
+     * @return \Jenky\Cartolic\Contracts\Fee\Collector
+     */
+    public function fees(): Collector;
+
     /**
      * Get all the cart items.
      *
@@ -57,7 +65,7 @@ interface Cart extends Arrayable, Jsonable, JsonSerializable
      */
     public function add(Purchasable $item, int $quantity = 1): Item;
 
-    /*
+    /**
      * Update an item of the cart.
      *
      * @param  \Jenky\Cartolic\Purchasable $item
@@ -66,11 +74,12 @@ interface Cart extends Arrayable, Jsonable, JsonSerializable
      */
     // public function update(Purchasable $item, array $data = []): CartItem;
 
-    /*
+    /**
      * Remove an item from the cart.
      *
      * @param  \Jenky\Cartolic\Contracts\Purchasable $item
-     * @return void
+     * @param  int $quantity
+     * @return \Jenky\Cartolic\Contracts\Item|null
      */
-    // public function remove(Purchasable $item);
+    // public function remove(Purchasable $item, int $quantity = 1): ?Item;
 }

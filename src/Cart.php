@@ -2,10 +2,12 @@
 
 namespace Jenky\Cartolic;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use Jenky\Cartolic\Contracts\Cart\Cart as Contract;
 use Jenky\Cartolic\Contracts\Cart\Item;
+use Jenky\Cartolic\Contracts\Fee\Collector;
 use Jenky\Cartolic\Contracts\Money;
 use Jenky\Cartolic\Contracts\Purchasable;
 use Jenky\Cartolic\Contracts\Storage\StorageRepository;
@@ -15,6 +17,13 @@ class Cart implements Contract
     use Macroable;
 
     /**
+     * The application instance.
+     *
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
+
+    /**
      * The storage driver instance.
      *
      * @var \Jenky\Cartolic\Contracts\StorageRepository
@@ -22,14 +31,33 @@ class Cart implements Contract
     protected $storage;
 
     /**
+     * The shopping cart fees.
+     *
+     * @var \Jenky\Cartolic\Contracts\Fee\Collector
+     */
+    protected $fees;
+
+    /**
      * Create a new cart instance.
      *
-     * @param  \Jenky\Cartolic\Contracts\StorageRepository $storage
+     * @param  \Illuminate\Contracts\Foundation\Application $app
      * @return void
      */
-    public function __construct(StorageRepository $storage)
+    public function __construct(Application $app)
     {
-        $this->storage = $storage;
+        $this->app = $app;
+        $this->storage = $app->make(StorageRepository::class);
+        $this->fees = $app->make(Collector::class);
+    }
+
+    /**
+     * Get all the fees.
+     *
+     * @return \Jenky\Cartolic\Contracts\Fee\Collector
+     */
+    public function fees(): Collector
+    {
+        return $this->fees;
     }
 
     /**
@@ -61,7 +89,9 @@ class Cart implements Contract
      */
     public function total(): Money
     {
-        return $this->subtotal();
+        return $this->subtotal()->plus(
+            $this->fees()->amounts()->toMoney()
+        );
     }
 
     /**
@@ -162,6 +192,7 @@ class Cart implements Contract
     {
         return [
             'items' => $this->items()->toArray(),
+            'fees' => $this->fees()->toArray(),
             'subtotal' => $this->subtotal(),
             'total' => $this->total(),
         ];
