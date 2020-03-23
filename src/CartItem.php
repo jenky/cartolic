@@ -42,6 +42,10 @@ class CartItem implements Item
         // $this->id = (string) Str::orderedUuid();
         // $this->id = $purchasable->hash();
 
+        if ($quantity <= 0) {
+            throw new \InvalidArgumentException('The item quantity can\'t be smaller than 1.');
+        }
+
         $this->quantity = $quantity;
     }
 
@@ -86,9 +90,11 @@ class CartItem implements Item
      */
     public function decrement(int $amount = 1)
     {
-        $quantity = $this->quantity -= $amount;
+        if ($amount >= $this->quantity()) {
+            throw new \InvalidArgumentException('The item quantity can\'t be smaller than 1.');
+        }
 
-        $this->quantity = $quantity >= 0 ? $quantity : 0;
+        $this->quantity -= $amount;
 
         return $this;
     }
