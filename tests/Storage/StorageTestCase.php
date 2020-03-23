@@ -12,7 +12,7 @@ use Jenky\Cartolic\Money;
 use Jenky\Cartolic\Purchasable;
 use Jenky\Cartolic\Tests\TestCase;
 
-abstract class CartStorageTestCase extends TestCase
+abstract class StorageTestCase extends TestCase
 {
     use WithFaker;
 
