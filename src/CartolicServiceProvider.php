@@ -17,6 +17,20 @@ class CartolicServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPublishing();
+
+        $this->registerMigrations();
+    }
+
+    /**
+     * Register the package's migrations.
+     *
+     * @return void
+     */
+    private function registerMigrations()
+    {
+        if ($this->app->runningInConsole() && $this->shouldMigrate()) {
+            $this->loadMigrationsFrom(__DIR__.'/../migrations');
+        }
     }
 
     /**
@@ -91,5 +105,15 @@ class CartolicServiceProvider extends ServiceProvider
         });
 
         $this->app->alias(Contract::class, 'cart');
+    }
+
+    /**
+     * Determine if we should register the migrations.
+     *
+     * @return bool
+     */
+    protected function shouldMigrate()
+    {
+        return $this->app['config']->get('cart.driver') === 'database';
     }
 }
