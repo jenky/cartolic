@@ -2,7 +2,7 @@
 
 namespace Jenky\Cartolic\Storage;
 
-use Illuminate\Session\Store;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Collection;
 use Jenky\Cartolic\Contracts\Storage\StorageRepository;
 
@@ -25,11 +25,11 @@ class SessionRepository implements StorageRepository
     /**
      * Create new Session repository instance.
      *
-     * @param  \Illuminate\Session\Store $session
+     * @param  \Illuminate\Contracts\Session\Session $session
      * @param  string $storageKey
      * @return void
      */
-    public function __construct(Store $session, $storageKey)
+    public function __construct(Session $session, $storageKey)
     {
         $this->session = $session;
         $this->storageKey = $storageKey;
@@ -61,6 +61,19 @@ class SessionRepository implements StorageRepository
     }
 
     /**
+     * Remove a given cart storage value.
+     *
+     * @param  mixed $value
+     * @return mixed
+     */
+    public function remove($value)
+    {
+        return $this->session->pull(
+            $this->storageKey.'.'.$value
+        );
+    }
+
+    /**
      * Prepend a value onto an array cart storage value.
      *
      * @param  mixed $value
@@ -81,5 +94,15 @@ class SessionRepository implements StorageRepository
         return $this->session->push(
             $this->storageKey, $value
         );
+    }
+
+    /**
+     * Remove all of the items from the cart storage.
+     *
+     * @return void
+     */
+    public function flush()
+    {
+        $this->session->forget($this->storageKey);
     }
 }

@@ -84,12 +84,12 @@ class CartolicServiceProvider extends ServiceProvider
      */
     protected function registerCart()
     {
+        $this->app->singleton(Collector::class, Fees::class);
+
         $this->app->singleton(Contract::class, function ($app) {
             return new Cart($app);
         });
 
         $this->app->alias(Contract::class, 'cart');
-
-        $this->app->singleton(Collector::class, Fees::class);
     }
 }

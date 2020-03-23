@@ -57,8 +57,8 @@ class Fees implements Collector
     public function amounts(): Money
     {
         return collect($this->all())->reduce(function ($carry, Fee $fee) {
-            return $carry->plus($fee->cost()->toMoney());
-        }, new \Jenky\Cartolic\Money(\Brick\Money\Money::zero('USD')));
+            return $carry->plus($fee->cost());
+        }, \Jenky\Cartolic\Money::zero());
     }
 
     /**

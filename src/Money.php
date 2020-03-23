@@ -3,9 +3,11 @@
 namespace Jenky\Cartolic;
 
 use Brick\Money\AbstractMoney;
+use Brick\Money\Money as BrickMoney;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Jenky\Cartolic\Contracts\Money as Contract;
 
-class Money implements Contracts\Money
+class Money implements Contract
 {
     use ForwardsCalls;
 
@@ -14,6 +16,11 @@ class Money implements Contracts\Money
     public function __construct(AbstractMoney $money)
     {
         $this->money = $money;
+    }
+
+    public static function zero(?string $currency = null)
+    {
+        return new static(BrickMoney::zero($currency ?: config('cart.currency')));
     }
 
     public function toMoney(): AbstractMoney
@@ -90,6 +97,10 @@ class Money implements Contracts\Money
      */
     public function __call($method, $parameters)
     {
+        if (isset($parameters[0]) && $parameters[0] instanceof Contract) {
+            $parameters[0] = $parameters[0]->toMoney();
+        }
+
         return new static(
             $this->forwardCallTo($this->money, $method, $parameters)
         );

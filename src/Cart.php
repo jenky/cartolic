@@ -67,7 +67,7 @@ class Cart implements Contract
      */
     public function items(): Collection
     {
-        return $this->storage->get()->values();
+        return $this->storage->get();
     }
 
     /**
@@ -78,8 +78,8 @@ class Cart implements Contract
     public function subtotal(): Money
     {
         return $this->items()->reduce(function ($carry, Item $item) {
-            return $carry->plus($item->total()->toMoney());
-        }, new \Jenky\Cartolic\Money(\Brick\Money\Money::zero('USD')));
+            return $carry->plus($item->total());
+        }, \Jenky\Cartolic\Money::zero());
     }
 
     /**
@@ -90,7 +90,7 @@ class Cart implements Contract
     public function total(): Money
     {
         return $this->subtotal()->plus(
-            $this->fees()->amounts()->toMoney()
+            $this->fees()->amounts()
         );
     }
 
@@ -130,11 +130,7 @@ class Cart implements Contract
      */
     public function get($item): ?Item
     {
-        $id = $this->getItemId($item);
-
-        return $this->items()->first(function ($cartItem) use ($id) {
-            return $cartItem->purchasable()->sku() == $id;
-        });
+        return $this->items()->get($this->getItemId($item));
     }
 
     /**
@@ -147,17 +143,15 @@ class Cart implements Contract
     public function add(Purchasable $purchasable, int $quantity = 1): Item
     {
         // Find already added items that are identical to current selection.
-        if ($item = $this->get($purchasable)) {
-            // Update item item in cart.
-            $this->storage->set([
-                $item->purchasable()->sku() => $item->increment($quantity),
-            ]);
+        if ($this->has($purchasable)) {
+            $item = $this->get($purchasable)->increment($quantity);
         } else {
-            // Otherwise, push it to the storage.
-            $this->storage->push(
-                $item = new CartItem($purchasable, $quantity)
-            );
+            $item = new CartItem($purchasable, $quantity);
         }
+
+        $this->storage->set([
+            $this->getItemId($item) => $item,
+        ]);
 
         return $item;
     }
@@ -166,11 +160,32 @@ class Cart implements Contract
      * Remove an item from the cart.
      *
      * @param  \Jenky\Cartolic\Contracts\Purchasable $item
-     * @return void
+     * @param  int|null $quantity
+     * @return \Jenky\Cartolic\Contracts\Item|null
      */
-    public function remove(Purchasable $item)
+    public function remove(Purchasable $item, ?int $quantity = null): ?Item
     {
-        //
+        if (! $this->has($item)) {
+            return null;
+        }
+
+        $item = $this->get($item);
+        $id = $this->getItemId($item);
+
+        if (is_null($quantity) || $quantity > $item->quantity()) {
+            // Remove the item from the cart.
+            $this->storage->remove($id);
+
+            return null;
+        }
+
+        $item->decrement($quantity);
+
+        $this->storage->set([
+            $id => $item,
+        ]);
+
+        return $item;
     }
 
     /**
@@ -180,7 +195,7 @@ class Cart implements Contract
      */
     public function clear()
     {
-        //
+        $this->storage->flush();
     }
 
     /**
@@ -191,7 +206,7 @@ class Cart implements Contract
     public function toArray()
     {
         return [
-            'items' => $this->items()->toArray(),
+            'items' => $this->items()->values()->toArray(),
             'fees' => $this->fees()->toArray(),
             'subtotal' => $this->subtotal(),
             'total' => $this->total(),

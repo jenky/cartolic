@@ -78,8 +78,15 @@ interface Cart extends Arrayable, Jsonable, JsonSerializable
      * Remove an item from the cart.
      *
      * @param  \Jenky\Cartolic\Contracts\Purchasable $item
-     * @param  int $quantity
+     * @param  int|null $quantity
      * @return \Jenky\Cartolic\Contracts\Item|null
      */
-    // public function remove(Purchasable $item, int $quantity = 1): ?Item;
+    public function remove(Purchasable $item, ?int $quantity = null): ?Item;
+
+    /**
+     * Clear the cart.
+     *
+     * @return void
+     */
+    public function clear();
 }
