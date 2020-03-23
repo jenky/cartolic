@@ -77,7 +77,7 @@ class CartItem implements Item
      */
     public function increment(int $amount = 1)
     {
-        $this->quantity += $amount;
+        $this->quantity += abs($amount);
 
         return $this;
     }
@@ -94,7 +94,7 @@ class CartItem implements Item
             throw new \InvalidArgumentException('The item quantity can\'t be smaller than 1.');
         }
 
-        $this->quantity -= $amount;
+        $this->quantity -= abs($amount);
 
         return $this;
     }
