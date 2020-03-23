@@ -14,13 +14,22 @@ class DatabaseRepository implements StorageRepository
     protected $connection;
 
     /**
+     * The database table name that should be used.
+     *
+     * @var string
+     */
+    protected $table;
+
+    /**
      * Create new Database repository instance.
      *
-     * @param  string $driver
+     * @param  string $connection
+     * @param  string $table
      * @return void
      */
-    public function __construct($connection)
+    public function __construct(string $connection, string $table)
     {
         $this->connection = $connection;
+        $this->table = $table;
     }
 }
