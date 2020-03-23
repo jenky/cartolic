@@ -93,7 +93,7 @@ class Money implements Contract
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return self
+     * @return mixed
      */
     public function __call($method, $parameters)
     {
@@ -101,8 +101,8 @@ class Money implements Contract
             $parameters[0] = $parameters[0]->toMoney();
         }
 
-        return new static(
-            $this->forwardCallTo($this->money, $method, $parameters)
-        );
+        $result = $this->forwardCallTo($this->money, $method, $parameters);
+
+        return $result instanceof BrickMoney ? new static($result) : $result;
     }
 }

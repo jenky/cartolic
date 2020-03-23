@@ -17,4 +17,9 @@ class DatabaseRepositoryTest extends TestCase
 
         $this->app['config']->set('cart.driver', 'database');
     }
+
+    public function test_example()
+    {
+        return $this->assertTrue(true);
+    }
 }
