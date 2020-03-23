@@ -142,11 +142,13 @@ class Cart implements Contract
      */
     public function add(Purchasable $purchasable, int $quantity = 1): Item
     {
-        // Find already added items that are identical to current selection.
         if ($this->has($purchasable)) {
             $item = $this->get($purchasable)->increment($quantity);
         } else {
-            $item = new CartItem($purchasable, $quantity);
+            // $item = new CartItem($purchasable, $quantity);
+            $item = $this->app->bound(Item::class)
+                ? $this->app->make(Item::class, compact('purchasable', 'quantity'))
+                : new CartItem($purchasable, $quantity);
         }
 
         $this->storage->set([
