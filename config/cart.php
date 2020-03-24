@@ -23,7 +23,8 @@ return [
 
         'database' => [
             'connection' => env('DB_CONNECTION', 'mysql'),
-            'table' => 'cart',
+            'table' => 'carts',
+            'guard' => 'web',
         ],
     ],
 

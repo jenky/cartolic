@@ -32,8 +32,33 @@ class StorageManager extends Manager
     public function createDatabaseDriver()
     {
         return new DatabaseRepository(
-            $this->config('cart.storage.database.connection'),
+            $this->getDatabaseConnection(),
             $this->config('cart.storage.database.table'),
+            $this->getAuthGuard()
+        );
+    }
+
+    /**
+     * Get the authentication guard for the database driver.
+     *
+     * @return \Illuminate\Contracts\Auth\Guard
+     */
+    protected function getAuthGuard()
+    {
+        return $this->app->make('auth')->guard(
+            $this->config('cart.storage.database.guard')
+        );
+    }
+
+    /**
+     * Get the database connection for the database driver.
+     *
+     * @return \Illuminate\Database\ConnectionInterface
+     */
+    protected function getDatabaseConnection()
+    {
+        return $this->app->make('db')->connection(
+            $this->config('cart.storage.database.connection')
         );
     }
 
@@ -45,8 +70,20 @@ class StorageManager extends Manager
     public function createSessionDriver()
     {
         return new SessionRepository(
-            $this->app->make('session')->driver($this->config('cart.storage.session.driver')),
+            $this->getSessionDriver(),
             $this->config('cart.storage.session.storage_key')
+        );
+    }
+
+    /**
+     * Get the session underlying driver handler for the session driver.
+     *
+     * @return \Illuminate\Contracts\Session\Session
+     */
+    protected function getSessionDriver()
+    {
+        return $this->app->make('session')->driver(
+            $this->config('cart.storage.session.driver')
         );
     }
 
