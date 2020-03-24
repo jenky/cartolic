@@ -33,7 +33,7 @@ class Fees implements Collector
      */
     public function add(Fee $fee)
     {
-        $this->fees[$this->normalizeFeeName($fee->name())] = $fee;
+        $this->fees[$this->normalizeFeeId($fee->id())] = $fee;
 
         return $this;
     }
@@ -46,7 +46,7 @@ class Fees implements Collector
      */
     public function get($fee): ?Fee
     {
-        return $this->fees[$this->normalizeFeeName($fee)] ?? null;
+        return $this->fees[$this->normalizeFeeId($fee)] ?? null;
     }
 
     /**
@@ -62,14 +62,14 @@ class Fees implements Collector
     }
 
     /**
-     * Normalize fee name to use as array key.
+     * Normalize fee id to use as array key.
      *
-     * @param  string $name
+     * @param  string $id
      * @return string
      */
-    protected function normalizeFeeName($name): string
+    protected function normalizeFeeId($id): string
     {
-        return Str::snake($name);
+        return Str::snake($id);
     }
 
     /**

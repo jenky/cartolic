@@ -7,6 +7,13 @@ use Jenky\Cartolic\Contracts\Money;
 interface Fee
 {
     /**
+     * Get the fee unique ID.
+     *
+     * @return string
+     */
+    public function id();
+
+    /**
      * Get the fee name.
      *
      * @return string
