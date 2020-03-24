@@ -42,7 +42,7 @@ class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $config = $app->get('config');
+        $config = $app->make('config');
 
         $config->set('database.default', 'testbench');
 
@@ -51,5 +51,7 @@ class TestCase extends BaseTestCase
             'database' => ':memory:',
             'prefix' => '',
         ]);
+
+        $config->set('cart.storage.database.connection', 'testbench');
     }
 }

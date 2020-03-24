@@ -2,9 +2,7 @@
 
 namespace Jenky\Cartolic\Tests\Storage;
 
-use Jenky\Cartolic\Tests\TestCase;
-
-class DatabaseRepositoryTest extends TestCase
+class DatabaseRepositoryTest extends StorageTestCase
 {
     /**
      * Setup the test environment.
@@ -16,10 +14,7 @@ class DatabaseRepositoryTest extends TestCase
         parent::setUp();
 
         $this->app['config']->set('cart.driver', 'database');
-    }
 
-    public function test_example()
-    {
-        return $this->assertTrue(true);
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
     }
 }

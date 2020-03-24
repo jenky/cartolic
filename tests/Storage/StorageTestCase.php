@@ -4,6 +4,7 @@ namespace Jenky\Cartolic\Tests\Storage;
 
 use Brick\Math\RoundingMode;
 use Brick\Money\Money as BrickMoney;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
 use Jenky\Cartolic\Contracts\Cart\Cart;
@@ -14,7 +15,14 @@ use Jenky\Cartolic\Tests\TestCase;
 
 abstract class StorageTestCase extends TestCase
 {
-    use WithFaker;
+    use WithFaker, RefreshDatabase;
+
+    /**
+     * The purchasable item.
+     *
+     * @var \Jenky\Cartolic\Contracts\Purchasable
+     */
+    protected $item;
 
     /**
      * Setup the test environment.
@@ -38,9 +46,9 @@ abstract class StorageTestCase extends TestCase
         $items = \Jenky\Cartolic\Facades\Cart::items();
 
         $this->assertInstanceOf(Collection::class, $items);
-        $this->assertTrue($items->isEmpty(), 'Cart items are not empty');
+        $this->assertTrue($items->isEmpty(), 'Cart is empty');
         $this->assertEmpty($items->toArray());
-        $this->assertTrue(\Jenky\Cartolic\Facades\Cart::total()->isZero(), 'Cart total is not zero');
+        $this->assertTrue(\Jenky\Cartolic\Facades\Cart::total()->isZero(), 'Cart total is zero');
     }
 
     public function test_add_item_to_cart()
@@ -89,8 +97,8 @@ abstract class StorageTestCase extends TestCase
 
         $cart->clear();
         $this->assertEmpty($cart->items());
-        $this->assertTrue($cart->total()->isZero(), 'Cart total is not zero');
-        $this->assertTrue($cart->fees()->amounts()->isZero(), 'Cart fees are not zero');
+        $this->assertTrue($cart->total()->isZero(), 'Cart total is zero');
+        $this->assertTrue($cart->fees()->amounts()->isZero(), 'Cart fees are zero');
     }
 
     public function test_fees()
