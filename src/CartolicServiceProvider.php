@@ -114,6 +114,7 @@ class CartolicServiceProvider extends ServiceProvider
      */
     protected function shouldMigrate()
     {
-        return $this->app['config']->get('cart.driver') === 'database';
+        // return $this->app['config']->get('cart.driver') === 'database';
+        return true;
     }
 }
