@@ -60,7 +60,7 @@ class DatabaseRepository implements StorageRepository
     /**
      * Get the cart from database storage.
      *
-     * @return array|null
+     * @return object|null
      */
     protected function getCart()
     {
@@ -78,11 +78,11 @@ class DatabaseRepository implements StorageRepository
     {
         $cart = $this->getCart();
 
-        if (! $cart) {
+        if (! $cart || ! empty($cart->items)) {
             return [];
         }
 
-        return ! empty($cart['items']) ? json_decode($cart['items'], true) : [];
+        return @unserialize(base64_decode($cart->items));
     }
 
     /**
@@ -121,7 +121,7 @@ class DatabaseRepository implements StorageRepository
     protected function prepareData(array $items): array
     {
         return [
-            'items' => json_encode($items),
+            'items' => @serialize(base64_encode($items)),
         ];
     }
 
@@ -144,6 +144,7 @@ class DatabaseRepository implements StorageRepository
     public function set($value)
     {
         $items = $this->getCartItems();
+        $exists = ! empty($items);
 
         foreach ((array) $value as $arrayKey => $arrayValue) {
             Arr::set($items, $arrayKey, $arrayValue);
@@ -151,7 +152,7 @@ class DatabaseRepository implements StorageRepository
 
         $data = $this->prepareData($items);
 
-        return $items ? $this->performUpdate($data) : $this->performInsert($data);
+        return $exists ? $this->performUpdate($data) : $this->performInsert($data);
     }
 
     /**
