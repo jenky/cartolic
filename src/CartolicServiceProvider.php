@@ -42,6 +42,10 @@ class CartolicServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
+                __DIR__.'/../migrations' => database_path('migrations'),
+            ], 'cartolic-migrations');
+
+            $this->publishes([
                 __DIR__.'/../config/cart.php' => config_path('cart.php'),
             ], 'cartolic-config');
         }

@@ -44,7 +44,7 @@ class DatabaseRepositoryTest extends StorageTestCase
         $this->assertCount(1, $cart->items());
         $this->assertEquals(1, $item->quantity());
 
-        $cart->add($item->purchasable(), 5);
+        $item = $cart->add($item->purchasable(), 5);
         $this->assertCount(1, $cart->items());
         $this->assertEquals(6, $item->quantity());
         $this->assertTrue($cart->total()->isPositive(), 'Cart total is not zero');
@@ -61,11 +61,11 @@ class DatabaseRepositoryTest extends StorageTestCase
         $cart = $this->app->make(Cart::class);
         $item = $cart->add($this->item, 10);
 
-        $cart->remove($item->purchasable(), 1);
+        $item = $cart->remove($item->purchasable(), 1);
         $this->assertCount(1, $cart->items());
         $this->assertEquals(9, $item->quantity());
 
-        $cart->remove($item->purchasable(), 4);
+        $item = $cart->remove($item->purchasable(), 4);
         $this->assertCount(1, $cart->items());
         $this->assertEquals(5, $item->quantity());
 
@@ -77,7 +77,7 @@ class DatabaseRepositoryTest extends StorageTestCase
     public function test_clear_cart()
     {
         $cart = $this->app->make(Cart::class);
-        $cart->add($this->item, $this->faker->randomNumber(1));
+        $cart->add($this->item, $this->faker->numberBetween(1, 10));
 
         $cart->clear();
         $this->assertEmpty($cart->items());

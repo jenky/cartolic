@@ -78,7 +78,7 @@ class DatabaseRepository implements StorageRepository
     {
         $cart = $this->getCart();
 
-        if (! $cart || ! empty($cart->items)) {
+        if (! $cart || empty($cart->items)) {
             return [];
         }
 
@@ -121,7 +121,9 @@ class DatabaseRepository implements StorageRepository
     protected function prepareData(array $items): array
     {
         return [
-            'items' => @serialize(base64_encode($items)),
+            'items' => base64_encode(@serialize($items)),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 

@@ -36,4 +36,16 @@ abstract class StorageTestCase extends TestCase
                 BrickMoney::ofMinor($this->faker->numberBetween(1000), 'USD') // Todo: use faker->currencyCode
             ));
     }
+
+    /**
+     * Clean up the testing environment before the next test.
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        $this->app['cart']->clear();
+
+        parent::tearDown();
+    }
 }
