@@ -2,13 +2,9 @@
 
 namespace Jenky\Cartolic\Tests\Storage;
 
-use Brick\Math\RoundingMode;
 use Brick\Money\Money as BrickMoney;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Collection;
-use Jenky\Cartolic\Contracts\Cart\Cart;
-use Jenky\Cartolic\Fee;
 use Jenky\Cartolic\Money;
 use Jenky\Cartolic\Purchasable;
 use Jenky\Cartolic\Tests\TestCase;
