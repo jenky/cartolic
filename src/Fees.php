@@ -5,6 +5,7 @@ namespace Jenky\Cartolic;
 use Illuminate\Support\Str;
 use Jenky\Cartolic\Contracts\Fee\Collector;
 use Jenky\Cartolic\Contracts\Fee\Fee;
+use Jenky\Cartolic\Contracts\Money;
 
 class Fees implements Collector
 {
