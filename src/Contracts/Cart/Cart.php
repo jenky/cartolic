@@ -2,15 +2,13 @@
 
 namespace Jenky\Cartolic\Contracts\Cart;
 
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Jenky\Cartolic\Contracts\Fee\Collector;
 use Jenky\Cartolic\Contracts\Money;
 use Jenky\Cartolic\Contracts\Purchasable;
 use JsonSerializable;
 
-interface Cart extends Arrayable, Jsonable, JsonSerializable
+interface Cart extends JsonSerializable
 {
     /**
      * Get all the fees.

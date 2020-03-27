@@ -2,12 +2,14 @@
 
 namespace Jenky\Cartolic;
 
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Str;
 use Jenky\Cartolic\Contracts\Fee\Collector;
 use Jenky\Cartolic\Contracts\Fee\Fee;
 use Jenky\Cartolic\Contracts\Money;
 
-class Fees implements Collector
+class Fees implements Collector, Arrayable, Jsonable
 {
     /**
      * The list of fees.

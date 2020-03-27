@@ -2,12 +2,10 @@
 
 namespace Jenky\Cartolic\Contracts\Fee;
 
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
 use Jenky\Cartolic\Contracts\Money;
 use JsonSerializable;
 
-interface Collector extends Arrayable, Jsonable, JsonSerializable
+interface Collector extends JsonSerializable
 {
     /**
      * Get all the fees.

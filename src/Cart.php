@@ -3,6 +3,8 @@
 namespace Jenky\Cartolic;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use Jenky\Cartolic\Contracts\Cart\Cart as Contract;
@@ -12,7 +14,7 @@ use Jenky\Cartolic\Contracts\Money;
 use Jenky\Cartolic\Contracts\Purchasable;
 use Jenky\Cartolic\Contracts\Storage\StorageRepository;
 
-class Cart implements Contract
+class Cart implements Contract, Arrayable, Jsonable
 {
     use Macroable;
 
