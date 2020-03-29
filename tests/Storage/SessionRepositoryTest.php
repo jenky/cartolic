@@ -5,7 +5,11 @@ namespace Jenky\Cartolic\Tests\Storage;
 use Brick\Math\RoundingMode;
 use Brick\Money\Money as BrickMoney;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Jenky\Cartolic\Contracts\Cart\Cart;
+use Jenky\Cartolic\Events\ItemAdded;
+use Jenky\Cartolic\Events\ItemRemoved;
+use Jenky\Cartolic\Events\ItemUpdated;
 use Jenky\Cartolic\Fee;
 use Jenky\Cartolic\Money;
 
@@ -106,5 +110,24 @@ class SessionRepositoryTest extends StorageTestCase
         $this->assertTrue($cart->total()->isEqualTo(
             $cart->subtotal()->plus($cart->fees()->amounts())
         ), 'Cart total is equals to subtotal plus fees');
+    }
+
+    public function test_events()
+    {
+        Event::fake();
+
+        $cart = $this->app->make(Cart::class);
+        $cart->add($this->item);
+
+        Event::assertDispatched(ItemAdded::class);
+
+        $cart->add($this->item, 5);
+        $cart->remove($this->item, 2);
+
+        Event::assertDispatched(ItemUpdated::class, 2);
+
+        $cart->remove($this->item);
+
+        Event::assertDispatched(ItemRemoved::class);
     }
 }

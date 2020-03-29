@@ -13,6 +13,9 @@ use Jenky\Cartolic\Contracts\Fee\Collector;
 use Jenky\Cartolic\Contracts\Money;
 use Jenky\Cartolic\Contracts\Purchasable;
 use Jenky\Cartolic\Contracts\Storage\StorageRepository;
+use Jenky\Cartolic\Events\ItemAdded;
+use Jenky\Cartolic\Events\ItemRemoved;
+use Jenky\Cartolic\Events\ItemUpdated;
 
 class Cart implements Contract, Arrayable, Jsonable
 {
@@ -24,6 +27,13 @@ class Cart implements Contract, Arrayable, Jsonable
      * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
+
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $event;
 
     /**
      * The storage driver instance.
@@ -48,6 +58,7 @@ class Cart implements Contract, Arrayable, Jsonable
     public function __construct(Application $app)
     {
         $this->app = $app;
+        $this->event = $app->make('events');
         $this->storage = $app->make(StorageRepository::class);
         $this->fees = $app->make(Collector::class);
     }
@@ -146,16 +157,22 @@ class Cart implements Contract, Arrayable, Jsonable
     {
         if ($this->has($purchasable)) {
             $item = $this->get($purchasable)->increment($quantity);
+
+            $event = new ItemUpdated($item);
         } else {
             // $item = new CartItem($purchasable, $quantity);
             $item = $this->app->bound(Item::class)
                 ? $this->app->make(Item::class, compact('purchasable', 'quantity'))
                 : new CartItem($purchasable, $quantity);
+
+            $event = new ItemAdded($item);
         }
 
         $this->storage->set([
             $this->getItemId($item) => $item,
         ]);
+
+        $this->event->dispatch($event);
 
         return $item;
     }
@@ -180,6 +197,8 @@ class Cart implements Contract, Arrayable, Jsonable
             // Remove the item from the cart.
             $this->storage->remove($id);
 
+            $this->event->dispatch(new ItemRemoved($item));
+
             return null;
         }
 
@@ -188,6 +207,8 @@ class Cart implements Contract, Arrayable, Jsonable
         $this->storage->set([
             $id => $item,
         ]);
+
+        $this->event->dispatch(new ItemUpdated($item));
 
         return $item;
     }
