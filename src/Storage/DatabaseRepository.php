@@ -7,7 +7,7 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Jenky\Cartolic\Contracts\Storage\StorageRepository;
+use Jenky\Cartolic\Contracts\StorageRepository;
 
 class DatabaseRepository implements StorageRepository
 {
@@ -138,12 +138,12 @@ class DatabaseRepository implements StorageRepository
     }
 
     /**
-     * Set a given cart storage value.
+     * Store the given items.
      *
-     * @param  mixed $value
+     * @param  \Illuminate\Support\Collection  $items
      * @return void
      */
-    public function set($value)
+    public function store(Collection $value)
     {
         $items = $this->getCartItems();
         $exists = ! empty($items);
@@ -155,32 +155,6 @@ class DatabaseRepository implements StorageRepository
         $data = $this->prepareData($items);
 
         return $exists ? $this->performUpdate($data) : $this->performInsert($data);
-    }
-
-    /**
-     * Remove a given cart storage value.
-     *
-     * @param  mixed $value
-     * @return mixed
-     */
-    public function remove($value)
-    {
-        $items = $this->getCartItems();
-
-        Arr::forget($items, $value);
-
-        return $this->performUpdate($this->prepareData($items));
-    }
-
-    /**
-     * Push a value onto an array cart storage value.
-     *
-     * @param  mixed $value
-     * @return void
-     */
-    public function push($value)
-    {
-        //
     }
 
     /**

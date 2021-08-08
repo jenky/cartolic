@@ -2,10 +2,7 @@
 
 namespace Jenky\Cartolic\Contracts\Fee;
 
-use Jenky\Cartolic\Contracts\Money;
-use JsonSerializable;
-
-interface Collector extends JsonSerializable
+interface Collector
 {
     /**
      * Get all the fees.
@@ -33,7 +30,7 @@ interface Collector extends JsonSerializable
     /**
      * Get total amounts of all fees.
      *
-     * @return \Jenky\Cartolic\Contracts\Money
+     * @return mixed
      */
-    public function amounts(): Money;
+    public function total();
 }

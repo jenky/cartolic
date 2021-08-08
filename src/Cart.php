@@ -2,38 +2,24 @@
 
 namespace Jenky\Cartolic;
 
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
-use Jenky\Cartolic\Contracts\Cart\Cart as Contract;
-use Jenky\Cartolic\Contracts\Cart\Item;
+use Jenky\Cartolic\Contracts\Cart as Contract;
 use Jenky\Cartolic\Contracts\Fee\Collector;
-use Jenky\Cartolic\Contracts\Money;
 use Jenky\Cartolic\Contracts\Purchasable;
-use Jenky\Cartolic\Contracts\Storage\StorageRepository;
+use Jenky\Cartolic\Contracts\StorageRepository;
+use Jenky\Cartolic\Events\CartCleared;
 use Jenky\Cartolic\Events\ItemAdded;
 use Jenky\Cartolic\Events\ItemRemoved;
 use Jenky\Cartolic\Events\ItemUpdated;
+use JsonSerializable;
 
-class Cart implements Contract, Arrayable, Jsonable
+class Cart implements Contract, Arrayable, Jsonable, JsonSerializable
 {
+    use Concerns\HasEvents;
     use Macroable;
-
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
-    /**
-     * The event dispatcher instance.
-     *
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $event;
 
     /**
      * The storage driver instance.
@@ -41,6 +27,13 @@ class Cart implements Contract, Arrayable, Jsonable
      * @var \Jenky\Cartolic\Contracts\StorageRepository
      */
     protected $storage;
+
+    /**
+     * The cart items.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $items;
 
     /**
      * The shopping cart fees.
@@ -52,15 +45,13 @@ class Cart implements Contract, Arrayable, Jsonable
     /**
      * Create a new cart instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @param  \Jenky\Cartolic\Contracts\StorageRepository  $storage
      * @return void
      */
-    public function __construct(Application $app)
+    public function __construct(StorageRepository $storage)
     {
-        $this->app = $app;
-        $this->event = $app->make('events');
-        $this->storage = $app->make(StorageRepository::class);
-        $this->fees = $app->make(Collector::class);
+        $this->storage = $storage;
+        $this->items = $storage->get();
     }
 
     /**
@@ -68,10 +59,10 @@ class Cart implements Contract, Arrayable, Jsonable
      *
      * @return \Jenky\Cartolic\Contracts\Fee\Collector
      */
-    public function fees(): Collector
-    {
-        return $this->fees;
-    }
+    // public function fees(): Collector
+    // {
+    //     return $this->fees;
+    // }
 
     /**
      * Get all the cart items.
@@ -80,40 +71,46 @@ class Cart implements Contract, Arrayable, Jsonable
      */
     public function items(): Collection
     {
-        return $this->storage->get();
+        return $this->items;
     }
 
     /**
      * Get cart subtotal.
      *
-     * @return \Jenky\Cartolic\Contracts\Money
+     * @return mixed
      */
-    public function subtotal(): Money
+    public function subtotal()
     {
+        if ($callback = Cartolic::$calculateSubtotalUsing) {
+            return $callback($this);
+        }
+
         return $this->items()->reduce(function ($carry, Item $item) {
-            return $carry->plus($item->total());
-        }, \Jenky\Cartolic\Money::zero());
+            return $carry + $item->total();
+        }, 0);
     }
 
     /**
      * Get cart total.
      *
-     * @return \Jenky\Cartolic\Contracts\Money
+     * @return mixed
      */
-    public function total(): Money
+    public function total()
     {
-        return $this->subtotal()->plus(
-            $this->fees()->amounts()
-        );
+        if ($callback = Cartolic::$calculateTotalUsing) {
+            return $callback($this);
+        }
+
+        return $this->subtotal(); //+ $this->fees()->total();
     }
 
     /**
      * Resolve the item id.
      *
-     * @param  mixed $item
+     * @param  mixed  $item
      * @return string|int
      */
-    protected function getItemId($item)
+    protected function itemId($item)
     {
         if ($item instanceof Purchasable) {
             return $item->sku();
@@ -127,90 +124,85 @@ class Cart implements Contract, Arrayable, Jsonable
     /**
      * Determine whether the cart has a specific item.
      *
-     * @param  mixed $item
+     * @param  mixed  $item
      * @return bool
      */
     public function has($item): bool
     {
-        return $this->items()->has($this->getItemId($item));
+        return $this->items()->has(
+            $this->itemId($item)
+        );
     }
 
     /**
      * Get the cart item.
      *
-     * @param  mixed $item
+     * @param  mixed  $item
      * @return \Jenky\Cartolic\Contracts\Cart\Item|null
      */
     public function get($item): ?Item
     {
-        return $this->items()->get($this->getItemId($item));
+        return $this->items()->get(
+            $this->itemId($item)
+        );
     }
 
     /**
      * Add an item to the cart.
      *
-     * @param  \Jenky\Cartolic\Contracts\Purchasable $item
-     * @param  int $quantity
-     * @return \Jenky\Cartolic\Contracts\Item
+     * @param  \Jenky\Cartolic\Contracts\Purchasable  $item
+     * @param  int  $quantity
+     * @return bool
      */
-    public function add(Purchasable $purchasable, int $quantity = 1): Item
+    public function add(Purchasable $purchasable, int $quantity = 1)
     {
         if ($this->has($purchasable)) {
             $item = $this->get($purchasable)->increment($quantity);
-
             $event = new ItemUpdated($item);
         } else {
-            // $item = new CartItem($purchasable, $quantity);
-            $item = $this->app->bound(Item::class)
-                ? $this->app->make(Item::class, compact('purchasable', 'quantity'))
-                : new CartItem($purchasable, $quantity);
-
+            $item = new Item($purchasable, $quantity);
             $event = new ItemAdded($item);
         }
 
-        $this->storage->set([
-            $this->getItemId($item) => $item,
-        ]);
+        $this->items()->put($this->itemId($item), $item);
 
-        $this->event->dispatch($event);
+        $this->event($event);
 
-        return $item;
+        return true;
     }
 
     /**
      * Remove an item from the cart.
      *
-     * @param  \Jenky\Cartolic\Contracts\Purchasable $item
-     * @param  int|null $quantity
-     * @return \Jenky\Cartolic\Contracts\Item|null
+     * @param  \Jenky\Cartolic\Contracts\Purchasable  $item
+     * @param  int|null  $quantity
+     * @return bool
      */
-    public function remove(Purchasable $item, ?int $quantity = null): ?Item
+    public function remove(Purchasable $item, ?int $quantity = null)
     {
         if (! $this->has($item)) {
-            return null;
+            return false;
         }
 
         $item = $this->get($item);
-        $id = $this->getItemId($item);
+        $id = $this->itemId($item);
 
         if (is_null($quantity) || $quantity > $item->quantity()) {
             // Remove the item from the cart.
-            $this->storage->remove($id);
+            $this->items()->forget($id);
 
-            $this->event->dispatch(new ItemRemoved($item));
+            $event = new ItemRemoved($item);
+        } else {
+            $this->items()->put(
+                $id, $item->decrement($quantity)
+            );
 
-            return null;
+            $event = new ItemUpdated($item);
         }
 
-        $item->decrement($quantity);
+        $this->event($event);
 
-        $this->storage->set([
-            $id => $item,
-        ]);
-
-        $this->event->dispatch(new ItemUpdated($item));
-
-        return $item;
+        return true;
     }
 
     /**
@@ -220,7 +212,21 @@ class Cart implements Contract, Arrayable, Jsonable
      */
     public function clear()
     {
+        $this->items = collect([]);
+
         $this->storage->flush();
+
+        $this->event(new CartCleared($this));
+    }
+
+    /**
+     * Save the cart to the persistent storage.
+     *
+     * @return mixed
+     */
+    public function save()
+    {
+        $this->storage->store($this->items());
     }
 
     /**
@@ -231,8 +237,8 @@ class Cart implements Contract, Arrayable, Jsonable
     public function toArray()
     {
         return [
-            'items' => $this->items()->values()->toArray(),
-            'fees' => $this->fees()->toArray(),
+            'items' => $this->items()->toArray(),
+            // 'fees' => $this->fees()->toArray(),
             'subtotal' => $this->subtotal(),
             'total' => $this->total(),
         ];
@@ -251,7 +257,7 @@ class Cart implements Contract, Arrayable, Jsonable
     /**
      * Convert the object to its JSON representation.
      *
-     * @param  int $options
+     * @param  int  $options
      * @return string
      */
     public function toJson($options = 0)

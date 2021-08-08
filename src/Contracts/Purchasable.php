@@ -2,11 +2,7 @@
 
 namespace Jenky\Cartolic\Contracts;
 
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
-use JsonSerializable;
-
-interface Purchasable extends Arrayable, Jsonable, JsonSerializable
+interface Purchasable
 {
     /**
      * Get the purchasable item hash.
@@ -25,16 +21,16 @@ interface Purchasable extends Arrayable, Jsonable, JsonSerializable
     /**
      * Get the purchasable item description.
      *
-     * @return string
+     * @return string|null
      */
-    public function description(): string;
+    public function description(): ?string;
 
     /**
      * Get the purchasable item price.
      *
-     * @return \Jenky\Cartolic\Contracts\Money
+     * @return mixed
      */
-    public function price(): Money;
+    public function price();
 
     /**
      * Get the purchasable item options.

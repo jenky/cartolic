@@ -2,8 +2,6 @@
 
 namespace Jenky\Cartolic\Contracts\Fee;
 
-use Jenky\Cartolic\Contracts\Money;
-
 interface Fee
 {
     /**
@@ -21,9 +19,9 @@ interface Fee
     public function name(): string;
 
     /**
-     * Get the fee cost.
+     * Get the fee amount.
      *
-     * @return \Jenky\Cartolic\Contracts\Money
+     * @return mixed
      */
-    public function cost(): Money;
+    public function amount();
 }

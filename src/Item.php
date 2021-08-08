@@ -2,14 +2,14 @@
 
 namespace Jenky\Cartolic;
 
-use Illuminate\Support\Str;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
-use Jenky\Cartolic\Contracts\Cart\Item;
-use Jenky\Cartolic\Contracts\Money;
 use Jenky\Cartolic\Contracts\Purchasable;
+use JsonSerializable;
 
-class CartItem implements Item
+class Item implements Arrayable, Jsonable, JsonSerializable
 {
     use ForwardsCalls, Macroable {
         __call as macroCall;
@@ -32,16 +32,13 @@ class CartItem implements Item
     /**
      * Create a new cart item instance.
      *
-     * @param  \Jenky\Cartolic\Contracts\Purchasable $purchasable
-     * @param  int $quantity
+     * @param  \Jenky\Cartolic\Contracts\Purchasable  $purchasable
+     * @param  int  $quantity
      * @return void
      */
     public function __construct(Purchasable $purchasable, int $quantity = 1)
     {
         $this->purchasable = $purchasable;
-
-        // $this->id = (string) Str::orderedUuid();
-        // $this->id = $purchasable->hash();
 
         if ($quantity <= 0) {
             throw new \InvalidArgumentException('The item quantity can\'t be smaller than 1.');
@@ -103,21 +100,19 @@ class CartItem implements Item
     /**
      * Get the subtotal amount of the item.
      *
-     * @return \Jenky\Cartolic\Contracts\Money
+     * @return mixed
      */
-    public function subtotal(): Money
+    public function subtotal()
     {
-        return $this->purchasable->price->multipliedBy(
-            $this->quantity
-        );
+        return $this->purchasable->price() * $this->quantity;
     }
 
     /**
      * Get the total amount of the item.
      *
-     * @return \Jenky\Cartolic\Contracts\Money
+     * @return mixed
      */
-    public function total(): Money
+    public function total()
     {
         return $this->subtotal();
     }
@@ -141,9 +136,16 @@ class CartItem implements Item
     {
         return [
             // 'id' => $this->id(),
-            'purchasable' => $this->purchasable->toArray(),
+            'purchasable' => [
+                'sku' => $this->purchasable->sku(),
+                'name' => $this->purchasable->name(),
+                'description' => $this->purchasable->description(),
+                'price' => $this->purchasable->price(),
+                'options' => $this->purchasable->options(),
+            ],
             'quantity' => $this->quantity(),
-            'total' => $this->total()->toArray(),
+            'subtotal' => $this->subtotal(),
+            'total' => $this->total(),
         ];
     }
 

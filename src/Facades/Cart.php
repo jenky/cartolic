@@ -3,7 +3,7 @@
 namespace Jenky\Cartolic\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Jenky\Cartolic\Contracts\Cart\Cart as Contract;
+use Jenky\Cartolic\Contracts\Cart as Contract;
 
 class Cart extends Facade
 {

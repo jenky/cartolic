@@ -2,21 +2,21 @@
 
 namespace Jenky\Cartolic\Events;
 
-use Jenky\Cartolic\Contracts\Cart\Item;
+use Jenky\Cartolic\Item;
 
 class ItemUpdated
 {
     /**
      * The updated cart item.
      *
-     * @var \Jenky\Cartolic\Contracts\Cart\Item
+     * @var \Jenky\Cartolic\Item
      */
     public $item;
 
     /**
      * Create new event instance.
      *
-     * @param  \Jenky\Cartolic\Contracts\Cart\Item $item
+     * @param  \Jenky\Cartolic\Item  $item
      * @return void
      */
     public function __construct(Item $item)

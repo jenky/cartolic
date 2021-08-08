@@ -3,25 +3,28 @@
 namespace Jenky\Cartolic;
 
 use Illuminate\Support\Manager;
+use Jenky\Cartolic\Contracts\StorageRepository;
 use Jenky\Cartolic\Storage\DatabaseRepository;
 use Jenky\Cartolic\Storage\SessionRepository;
 
 class StorageManager extends Manager
 {
     /**
-     * Get the config instance or value.
+     * Get a driver instance.
      *
-     * @param  string|null $key
-     * @param  mixed $default
-     * @return mixed
+     * @param  string|null  $driver
+     * @throws \InvalidArgumentException
+     * @return \Jenky\Cartolic\Contracts\StorageRepository
      */
-    protected function config(?string $key = null, $default = null)
+    public function driver($driver = null)
     {
-        $config = property_exists($this, 'config')
-            ? $this->config
-            : $this->app->make('config');
+        $driver = parent::driver($driver);
 
-        return $key ? $config->get($key, $default) : $config;
+        if (! $driver instanceof StorageRepository) {
+            throw new \InvalidArgumentException('The cart storage repository must implement '.StorageRepository::class);
+        }
+
+        return $driver;
     }
 
     /**
@@ -33,7 +36,7 @@ class StorageManager extends Manager
     {
         return new DatabaseRepository(
             $this->getDatabaseConnection(),
-            $this->config('cart.storage.database.table'),
+            $this->config->get('cart.storage.database.table'),
             $this->getAuthGuard()
         );
     }
@@ -45,8 +48,8 @@ class StorageManager extends Manager
      */
     protected function getAuthGuard()
     {
-        return $this->app->make('auth')->guard(
-            $this->config('cart.storage.database.guard')
+        return $this->container->make('auth')->guard(
+            $this->config->get('cart.storage.database.guard')
         );
     }
 
@@ -57,8 +60,8 @@ class StorageManager extends Manager
      */
     protected function getDatabaseConnection()
     {
-        return $this->app->make('db')->connection(
-            $this->config('cart.storage.database.connection')
+        return $this->container->make('db')->connection(
+            $this->config->get('cart.storage.database.connection')
         );
     }
 
@@ -71,7 +74,7 @@ class StorageManager extends Manager
     {
         return new SessionRepository(
             $this->getSessionDriver(),
-            $this->config('cart.storage.session.storage_key')
+            $this->config->get('cart.storage.session.storage_key', 'cartolic')
         );
     }
 
@@ -82,8 +85,8 @@ class StorageManager extends Manager
      */
     protected function getSessionDriver()
     {
-        return $this->app->make('session')->driver(
-            $this->config('cart.storage.session.driver')
+        return $this->container->make('session')->driver(
+            $this->config->get('cart.storage.session.driver')
         );
     }
 
@@ -94,6 +97,6 @@ class StorageManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->config('cart.driver');
+        return $this->config->get('cart.driver');
     }
 }

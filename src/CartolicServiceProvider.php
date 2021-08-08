@@ -2,12 +2,13 @@
 
 namespace Jenky\Cartolic;
 
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
-use Jenky\Cartolic\Contracts\Cart\Cart as Contract;
-use Jenky\Cartolic\Contracts\Fee\Collector;
-use Jenky\Cartolic\Contracts\Storage\StorageRepository;
+use Jenky\Cartolic\Contracts\Cart as CartContract;
+use Jenky\Cartolic\Contracts\StorageRepository;
 
-class CartolicServiceProvider extends ServiceProvider
+class CartolicServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Bootstrap any package services.
@@ -48,6 +49,10 @@ class CartolicServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../config/cart.php' => config_path('cart.php'),
             ], 'cartolic-config');
+
+            $this->publishes([
+                __DIR__.'/../stubs/CartolicServiceProvider.stub' => app_path('Providers/CartolicServiceProvider.php'),
+            ], 'cartolic-provider');
         }
     }
 
@@ -67,6 +72,10 @@ class CartolicServiceProvider extends ServiceProvider
         $this->registerStorageDriver();
 
         $this->registerCart();
+
+        // $this->commands([
+        //     Console\InstallCommand::class,
+        // ]);
     }
 
     /**
@@ -79,6 +88,8 @@ class CartolicServiceProvider extends ServiceProvider
         $this->app->singleton(StorageManager::class, function ($app) {
             return new StorageManager($app);
         });
+
+        $this->app->alias(StorageManager::class, 'cart.storage.manager');
     }
 
     /**
@@ -102,13 +113,15 @@ class CartolicServiceProvider extends ServiceProvider
      */
     protected function registerCart()
     {
-        $this->app->singleton(Collector::class, Fees::class);
+        // $this->app->singleton(Collector::class, Fees::class);
 
-        $this->app->singleton(Contract::class, function ($app) {
-            return new Cart($app);
+        $this->app->singleton(CartContract::class, function ($app) {
+            return tap(new Cart($app->make(StorageRepository::class)), function ($cart) use ($app) {
+                $cart->setEventDispatcher($app->make(Dispatcher::class));
+            });
         });
 
-        $this->app->alias(Contract::class, 'cart');
+        $this->app->alias(CartContract::class, 'cart');
     }
 
     /**
@@ -120,5 +133,19 @@ class CartolicServiceProvider extends ServiceProvider
     {
         // return $this->app['config']->get('cart.driver') === 'database';
         return true;
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [
+            StorageManager::class,
+            StorageRepository::class,
+            CartContract::class,
+        ];
     }
 }

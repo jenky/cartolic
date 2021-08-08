@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Providers;
+
+use Jenky\Cartolic\CartolicApplicationServiceProvider;
+
+class CartolicServiceProvider extends CartolicApplicationServiceProvider
+{
+    //
+}

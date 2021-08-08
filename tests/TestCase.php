@@ -38,6 +38,9 @@ class TestCase extends BaseTestCase
             'prefix' => '',
         ]);
 
-        $config->set('cart.storage.database.connection', 'testbench');
+        $config->set('cart.storage.database', [
+            'connection' => 'testbench',
+            'table' => 'carts',
+        ]);
     }
 }

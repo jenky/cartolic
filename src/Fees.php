@@ -7,9 +7,9 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Str;
 use Jenky\Cartolic\Contracts\Fee\Collector;
 use Jenky\Cartolic\Contracts\Fee\Fee;
-use Jenky\Cartolic\Contracts\Money;
+use JsonSerializable;
 
-class Fees implements Collector, Arrayable, Jsonable
+class Fees implements Collector, Arrayable, Jsonable, JsonSerializable
 {
     /**
      * The list of fees.
@@ -55,13 +55,13 @@ class Fees implements Collector, Arrayable, Jsonable
     /**
      * Get total amounts of all fees.
      *
-     * @return \Jenky\Cartolic\Contracts\Money
+     * @return mixed
      */
-    public function amounts(): Money
+    public function total()
     {
         return collect($this->all())->reduce(function ($carry, Fee $fee) {
-            return $carry->plus($fee->cost());
-        }, \Jenky\Cartolic\Money::zero());
+            return $carry + $fee->amount();
+        }, 0);
     }
 
     /**
