@@ -24,43 +24,7 @@ return [
         'database' => [
             'connection' => env('DB_CONNECTION', 'mysql'),
             'table' => 'carts',
-            'guard' => 'web',
         ],
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cartolic Currency
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify the default currency for your application, which
-    | will be used by the the cart and items.
-    |
-    */
-
-    'currency' => 'USD',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Currency Formatter
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify the default currency formatter for your
-    | application, which will be used to format the money.
-    |
-    */
-
-    'formatter' => \NumberFormatter::class,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Currency Locale
-    |--------------------------------------------------------------------------
-    |
-    | The currency locale determines the default locale that will be used
-    | by the money formatter.
-    |
-    */
-
-    'locale' => 'en_US',
 ];

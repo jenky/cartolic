@@ -2,7 +2,7 @@
 
 namespace Jenky\Cartolic\Storage;
 
-use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Auth\Factory;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
@@ -26,25 +26,25 @@ class DatabaseRepository implements StorageRepository
     protected $table;
 
     /**
-     * The authentication guard that should be used.
+     * The authentication factory instance.
      *
-     * @var \Illuminate\Contracts\Auth\Guard
+     * @var \Illuminate\Contracts\Auth\Factory
      */
-    protected $guard;
+    protected $auth;
 
     /**
      * Create new Database repository instance.
      *
-     * @param  \Illuminate\Database\ConnectionInterface $connection
-     * @param  string $table
-     * @param  \Illuminate\Contracts\Auth\Guard $guard
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @param  string  $table
+     * @param  \Illuminate\Contracts\Auth\Factory  $auth
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, string $table, Guard $guard)
+    public function __construct(ConnectionInterface $connection, string $table, Factory $auth)
     {
         $this->connection = $connection;
         $this->table = $table;
-        $this->guard = $guard;
+        $this->auth = $auth;
     }
 
     /**
@@ -52,7 +52,7 @@ class DatabaseRepository implements StorageRepository
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function getQuery()
+    protected function query()
     {
         return $this->connection->table($this->table);
     }
@@ -64,8 +64,8 @@ class DatabaseRepository implements StorageRepository
      */
     protected function getCart()
     {
-        return $this->getQuery()
-            ->where('user_id', $this->guard->id())
+        return $this->query()
+            ->where('user_id', $this->auth->id())
             ->first();
     }
 
@@ -94,7 +94,7 @@ class DatabaseRepository implements StorageRepository
     protected function performInsert(array $data)
     {
         try {
-            return $this->getQuery()->insert(Arr::set($data, 'user_id', $this->guard->id()));
+            return $this->query()->insert(Arr::set($data, 'user_id', $this->auth->id()));
         } catch (QueryException $e) {
             $this->performUpdate($data);
         }
@@ -108,7 +108,7 @@ class DatabaseRepository implements StorageRepository
      */
     protected function performUpdate(array $data)
     {
-        return $this->getQuery()->where('user_id', $this->guard->id())
+        return $this->query()->where('user_id', $this->auth->id())
             ->update($data);
     }
 
@@ -164,6 +164,6 @@ class DatabaseRepository implements StorageRepository
      */
     public function flush()
     {
-        $this->getQuery()->where('user_id', $this->guard->id())->delete();
+        $this->query()->where('user_id', $this->auth->id())->delete();
     }
 }

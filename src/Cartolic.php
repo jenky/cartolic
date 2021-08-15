@@ -26,7 +26,7 @@ class Cartolic
      * @param  \Closure  $callback
      * @return static
      */
-    public static function calculateSubtotal(Closure $callback)
+    public static function calculateSubtotalUsing(Closure $callback)
     {
         static::$calculateSubtotalUsing = $callback;
 
@@ -39,7 +39,7 @@ class Cartolic
      * @param  \Closure  $callback
      * @return static
      */
-    public static function calculateTotal(Closure $callback)
+    public static function calculateTotalUsing(Closure $callback)
     {
         static::$calculateTotalUsing = $callback;
 

@@ -30,7 +30,7 @@ class CartolicServiceProvider extends ServiceProvider implements DeferrableProvi
     private function registerMigrations()
     {
         if ($this->app->runningInConsole() && $this->shouldMigrate()) {
-            $this->loadMigrationsFrom(__DIR__.'/../migrations');
+            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         }
     }
 
@@ -43,7 +43,7 @@ class CartolicServiceProvider extends ServiceProvider implements DeferrableProvi
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../migrations' => database_path('migrations'),
+                __DIR__.'/../database/migrations' => database_path('migrations'),
             ], 'cartolic-migrations');
 
             $this->publishes([

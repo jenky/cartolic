@@ -62,18 +62,19 @@ class CartTest extends TestCase
     public function test_add_item_to_cart()
     {
         $cart = $this->app['cart'];
-        $item = $cart->add($this->item);
+        $cart->add($this->item);
+        $item = $cart->get($this->item);
 
         $this->assertNotEmpty($cart->items());
         $this->assertCount(1, $cart->items());
-        // $this->assertEquals(1, $item->quantity());
+        $this->assertEquals(1, $item->quantity());
 
-        $item = $cart->add($this->item, 5);
+        $cart->add($this->item, 5);
         $this->assertCount(1, $cart->items());
-        // $this->assertEquals(6, $item->quantity());
+        $this->assertEquals(6, $item->quantity());
         $this->assertTrue($cart->total() > 0, 'Cart total is not zero');
 
-        // $this->assertTrue($item->total() === $cart->subtotal(), 'Items total is equals to cart sub total');
+        $this->assertTrue($item->total() === $cart->subtotal(), 'Items total is equals to cart sub total');
 
         $cart->clear();
 
@@ -84,19 +85,20 @@ class CartTest extends TestCase
     public function test_remove_item()
     {
         $cart = $this->app->make(Cart::class);
-        $item = $cart->add($this->item, 10);
+        $cart->add($this->item, 10);
+        $item = $cart->get($this->item);
 
-        // $item = $cart->remove($item->purchasable(), 1);
+        $cart->remove($item->purchasable(), 1);
         $this->assertCount(1, $cart->items());
-        // $this->assertEquals(9, $item->quantity());
+        $this->assertEquals(9, $item->quantity());
 
-        // $item = $cart->remove($item->purchasable(), 4);
-        // $this->assertCount(1, $cart->items());
-        // $this->assertEquals(5, $item->quantity());
+        $cart->remove($item->purchasable(), 4);
+        $this->assertCount(1, $cart->items());
+        $this->assertEquals(5, $item->quantity());
 
-        // $cart->remove($item->purchasable());
-        // $this->assertCount(0, $cart->items());
-        // $this->assertEmpty($cart->items());
+        $cart->remove($item->purchasable());
+        $this->assertCount(0, $cart->items());
+        $this->assertEmpty($cart->items());
     }
 
     public function test_clear_cart()

@@ -8,13 +8,13 @@ use Jenky\Cartolic\Contracts\Purchasable;
 
 class Product implements Purchasable
 {
-    protected $sku;
+    public $sku;
 
-    protected $name;
+    public $name;
 
-    protected $description;
+    public $description;
 
-    protected $price;
+    public $price;
 
     public function __construct(Generator $faker)
     {

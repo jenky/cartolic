@@ -39,7 +39,7 @@ class CreateCartsTable extends Migration
     {
         $this->schema->create($this->table, function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable()->index();
             $table->text('items')->nullable();
             $table->timestamps();
         });
