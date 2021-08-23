@@ -2,10 +2,13 @@
 
 namespace Jenky\Cartolic;
 
+use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Tappable;
+use IteratorAggregate;
 use Jenky\Cartolic\Contracts\Cart as Contract;
 use Jenky\Cartolic\Contracts\Fee\Collector;
 use Jenky\Cartolic\Contracts\Purchasable;
@@ -16,10 +19,11 @@ use Jenky\Cartolic\Events\ItemRemoved;
 use Jenky\Cartolic\Events\ItemUpdated;
 use JsonSerializable;
 
-class Cart implements Contract, Arrayable, Jsonable, JsonSerializable
+class Cart implements Contract, Arrayable, Jsonable, JsonSerializable, Countable, IteratorAggregate
 {
     use Concerns\HasEvents;
     use Macroable;
+    use Tappable;
 
     /**
      * The storage driver instance.
@@ -75,6 +79,26 @@ class Cart implements Contract, Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Get an iterator for the items.
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return $this->items()->getIterator();
+    }
+
+    /**
+     * Get the number of items for the current cart.
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return $this->items()->count();
+    }
+
+    /**
      * Get cart subtotal.
      *
      * @return mixed
@@ -86,7 +110,7 @@ class Cart implements Contract, Arrayable, Jsonable, JsonSerializable
         }
 
         return $this->items()->reduce(function ($carry, Item $item) {
-            return $carry + $item->total();
+            return $carry + ($item->purchasable()->price() * $item->quantity());
         }, 0);
     }
 
